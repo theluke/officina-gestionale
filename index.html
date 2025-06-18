@@ -109,7 +109,7 @@
         <div id="clientiContent" class="tab-content">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-semibold text-gray-700">Elenco Clienti</h2>
-                <button onclick="openModal('addCustomerModal')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">
+                <button onclick="openAddCustomerModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">
                     <i class="fas fa-plus mr-2"></i>Aggiungi Cliente
                 </button>
             </div>
@@ -123,7 +123,7 @@
         <div id="veicoliContent" class="tab-content hidden">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-semibold text-gray-700">Elenco Veicoli per <span id="customerNameForVehicles" class="text-indigo-600"></span></h2>
-                <button onclick="openModal('addVehicleModal')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">
+                <button onclick="openAddVehicleModal()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">
                     <i class="fas fa-plus mr-2"></i>Aggiungi Veicolo
                 </button>
             </div>
@@ -137,7 +137,7 @@
         <div id="lavoriContent" class="tab-content hidden">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-semibold text-gray-700">Storico Lavori per <span id="vehicleIdentifierForWorks" class="text-indigo-600"></span></h2>
-                <button onclick="openModal('addWorkModal')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">
+                <button onclick="openAddWorkModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">
                     <i class="fas fa-plus mr-2"></i>Aggiungi Lavoro
                 </button>
             </div>
@@ -148,11 +148,11 @@
         </div>
     </div>
 
-    <!-- Modal Aggiungi Cliente -->
+    <!-- Modal Aggiungi/Modifica Cliente -->
     <div id="addCustomerModal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeModal('addCustomerModal')">&times;</span>
-            <h3 class="text-xl font-semibold mb-4 text-gray-700">Aggiungi Nuovo Cliente</h3>
+            <h3 id="customerModalTitle" class="text-xl font-semibold mb-4 text-gray-700">Aggiungi Nuovo Cliente</h3>
             <form id="addCustomerForm">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <input type="text" id="customerName" placeholder="Nome" class="p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" required>
@@ -163,16 +163,16 @@
                     <input type="email" id="customerEmail" placeholder="Email" class="p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
                 </div>
                 <textarea id="customerAddress" placeholder="Indirizzo" rows="3" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
-                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">Salva Cliente</button>
+                <button type="submit" id="customerSubmitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">Salva Cliente</button>
             </form>
         </div>
     </div>
 
-    <!-- Modal Aggiungi Veicolo -->
+    <!-- Modal Aggiungi/Modifica Veicolo -->
     <div id="addVehicleModal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeModal('addVehicleModal')">&times;</span>
-            <h3 class="text-xl font-semibold mb-4 text-gray-700">Aggiungi Nuovo Veicolo</h3>
+            <h3 id="vehicleModalTitle" class="text-xl font-semibold mb-4 text-gray-700">Aggiungi Nuovo Veicolo</h3>
             <form id="addVehicleForm">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <input type="text" id="vehicleMake" placeholder="Marca" class="p-2 border border-gray-300 rounded-md" required>
@@ -187,16 +187,16 @@
                     <input type="text" id="vehicleEngineType" placeholder="Tipo Motore/Cilindrata" class="p-2 border border-gray-300 rounded-md">
                 </div>
                 <textarea id="vehicleNotes" placeholder="Note aggiuntive sul veicolo" rows="3" class="w-full p-2 border border-gray-300 rounded-md mb-4"></textarea>
-                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Salva Veicolo</button>
+                <button type="submit" id="vehicleSubmitBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Salva Veicolo</button>
             </form>
         </div>
     </div>
 
-    <!-- Modal Aggiungi Lavoro -->
+    <!-- Modal Aggiungi/Modifica Lavoro -->
     <div id="addWorkModal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeModal('addWorkModal')">&times;</span>
-            <h3 class="text-xl font-semibold mb-4 text-gray-700">Aggiungi Nuovo Lavoro</h3>
+            <h3 id="workModalTitle" class="text-xl font-semibold mb-4 text-gray-700">Aggiungi Nuovo Lavoro</h3>
             <form id="addWorkForm">
                 <input type="date" id="workDate" class="w-full p-2 border border-gray-300 rounded-md mb-4" required>
                 <textarea id="workDescription" placeholder="Descrizione del lavoro eseguito" rows="3" class="w-full p-2 border border-gray-300 rounded-md mb-4" required></textarea>
@@ -256,7 +256,7 @@
                 <textarea id="workChecklistPersonalItemsNotes" placeholder="Oggetti Personali Lasciati (es. occhiali da sole, cavo USB)" rows="3" class="w-full p-2 border border-gray-300 rounded-md mb-4 text-sm"></textarea>
                 <!-- Fine Checklist -->
 
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Salva Lavoro</button>
+                <button type="submit" id="workSubmitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Salva Lavoro</button>
             </form>
         </div>
     </div>
@@ -285,7 +285,7 @@
         // Importazioni Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, addDoc, getDoc, deleteDoc, collection, query, where, onSnapshot, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, addDoc, getDoc, deleteDoc, collection, query, where, onSnapshot, serverTimestamp, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Configurazione Firebase (verrà iniettata da Canvas se disponibile)
 		const firebaseConfig = {
@@ -394,11 +394,21 @@
             const modal = document.getElementById(modalId);
             if (modal) {
                  modal.style.display = 'none';
-                // Resetta i form quando il modal viene chiuso
-                if (modalId === 'addCustomerModal') addCustomerForm.reset();
-                if (modalId === 'addVehicleModal') addVehicleForm.reset();
+                // Reset edit mode and forms when modal is closed
+                if (modalId === 'addCustomerModal') {
+                    addCustomerForm.reset();
+                    editMode.customer = false;
+                    editMode.currentId = null;
+                }
+                if (modalId === 'addVehicleModal') {
+                    addVehicleForm.reset();
+                    editMode.vehicle = false;
+                    editMode.currentId = null;
+                }
                 if (modalId === 'addWorkModal') {
-                    addWorkForm.reset(); 
+                    addWorkForm.reset();
+                    editMode.work = false;
+                    editMode.currentId = null;
                 }
             }
         }
@@ -447,9 +457,10 @@
                                 <strong class="text-indigo-700">${customer.surname} ${customer.name}</strong>
                                 <p class="text-sm text-gray-600">${customer.phone || ''} - ${customer.email || ''}</p>
                             </div>
-                            <div>
-                                <button onclick="event.stopPropagation(); viewCustomerDetails('${customer.id}')" class="text-blue-500 hover:text-blue-700 mr-2"><i class="fas fa-eye"></i></button>
-                                <button onclick="event.stopPropagation(); selectCustomer('${customer.id}', '${customer.name} ${customer.surname}')" class="text-green-500 hover:text-green-700"><i class="fas fa-car"></i> Veicoli</button>
+                            <div class="flex space-x-2">
+                                <button onclick="event.stopPropagation(); editCustomer('${customer.id}')" class="text-orange-500 hover:text-orange-700" title="Modifica"><i class="fas fa-edit"></i></button>
+                                <button onclick="event.stopPropagation(); viewCustomerDetails('${customer.id}')" class="text-blue-500 hover:text-blue-700" title="Visualizza"><i class="fas fa-eye"></i></button>
+                                <button onclick="event.stopPropagation(); selectCustomer('${customer.id}', '${customer.name} ${customer.surname}')" class="text-green-500 hover:text-green-700" title="Veicoli"><i class="fas fa-car"></i></button>
                             </div>
                         </li>`;
                 });
@@ -473,27 +484,83 @@
             });
         }
 
+        // Customer modal functions
+        window.openAddCustomerModal = function() {
+            editMode.customer = false;
+            editMode.currentId = null;
+            document.getElementById('customerModalTitle').textContent = 'Aggiungi Nuovo Cliente';
+            document.getElementById('customerSubmitBtn').textContent = 'Salva Cliente';
+            document.getElementById('addCustomerForm').reset();
+            openModal('addCustomerModal');
+        };
+
+        window.editCustomer = async function(customerId) {
+            if (!userId) return;
+            const customerDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/customers/${customerId}`;
+            try {
+                const docSnap = await getDoc(doc(db, customerDocPath));
+                if (docSnap.exists()) {
+                    const customer = docSnap.data();
+                    editMode.customer = true;
+                    editMode.currentId = customerId;
+                    
+                    document.getElementById('customerModalTitle').textContent = 'Modifica Cliente';
+                    document.getElementById('customerSubmitBtn').textContent = 'Aggiorna Cliente';
+                    
+                    // Pre-populate form
+                    document.getElementById('customerName').value = customer.name || '';
+                    document.getElementById('customerSurname').value = customer.surname || '';
+                    document.getElementById('customerPhone').value = customer.phone || '';
+                    document.getElementById('customerEmail').value = customer.email || '';
+                    document.getElementById('customerAddress').value = customer.address || '';
+                    
+                    openModal('addCustomerModal');
+                } else {
+                    showFeedbackMessage("Cliente non trovato.", 'error');
+                }
+            } catch (error) {
+                console.error("Errore nel caricare i dati del cliente:", error);
+                showFeedbackMessage("Errore nel caricare i dati: " + error.message, 'error');
+            }
+        };
+
         addCustomerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!userId) {
                 showFeedbackMessage("Utente non autenticato. Impossibile salvare.", 'error');
                 return;
             }
-            const customersColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/customers`;
+
+            const customerData = {
+                name: document.getElementById('customerName').value,
+                surname: document.getElementById('customerSurname').value,
+                phone: document.getElementById('customerPhone').value,
+                email: document.getElementById('customerEmail').value,
+                address: document.getElementById('customerAddress').value
+            };
+
             try {
-                await addDoc(collection(db, customersColPath), {
-                    name: document.getElementById('customerName').value,
-                    surname: document.getElementById('customerSurname').value,
-                    phone: document.getElementById('customerPhone').value,
-                    email: document.getElementById('customerEmail').value,
-                    address: document.getElementById('customerAddress').value,
-                    createdAt: serverTimestamp()
-                });
+                if (editMode.customer && editMode.currentId) {
+                    // Update existing customer
+                    const customerDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/customers/${editMode.currentId}`;
+                    await updateDoc(doc(db, customerDocPath), {
+                        ...customerData,
+                        updatedAt: serverTimestamp()
+                    });
+                    showFeedbackMessage("Cliente aggiornato con successo!", 'success');
+                } else {
+                    // Add new customer
+                    const customersColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/customers`;
+                    await addDoc(collection(db, customersColPath), {
+                        ...customerData,
+                        createdAt: serverTimestamp()
+                    });
+                    showFeedbackMessage("Cliente aggiunto con successo!", 'success');
+                }
                 closeModal('addCustomerModal');
-                showFeedbackMessage("Cliente aggiunto con successo!", 'success');
             } catch (error) {
-                console.error("Errore nell'aggiungere il cliente: ", error);
-                showFeedbackMessage("Errore aggiunta cliente: " + error.message, 'error');
+                console.error("Errore nel salvare il cliente: ", error);
+                showFeedbackMessage("Errore salvataggio cliente: " + error.message, 'error');
             }
         });
 
@@ -577,9 +644,10 @@
                                 <strong class="text-green-700">${vehicle.make} ${vehicle.model} (${vehicle.year || 'N/A'})</strong>
                                 <p class="text-sm text-gray-600">Targa: ${vehicle.licensePlate || 'N/D'} - Telaio: ${vehicle.vin || 'N/D'}</p>
                             </div>
-                             <div>
-                                <button onclick="event.stopPropagation(); viewVehicleDetails('${vehicle.id}')" class="text-blue-500 hover:text-blue-700 mr-2"><i class="fas fa-eye"></i></button>
-                                <button onclick="event.stopPropagation(); selectVehicle('${vehicle.id}', '${vehicleDisplay}')" class="text-purple-500 hover:text-purple-700"><i class="fas fa-tools"></i> Lavori</button>
+                            <div class="flex space-x-2">
+                                <button onclick="event.stopPropagation(); editVehicle('${vehicle.id}')" class="text-orange-500 hover:text-orange-700" title="Modifica"><i class="fas fa-edit"></i></button>
+                                <button onclick="event.stopPropagation(); viewVehicleDetails('${vehicle.id}')" class="text-blue-500 hover:text-blue-700" title="Visualizza"><i class="fas fa-eye"></i></button>
+                                <button onclick="event.stopPropagation(); selectVehicle('${vehicle.id}', '${vehicleDisplay}')" class="text-purple-500 hover:text-purple-700" title="Lavori"><i class="fas fa-tools"></i></button>
                             </div>
                         </li>`;
                 });
@@ -603,30 +671,88 @@
             });
         }
 
+        // Vehicle modal functions
+        window.openAddVehicleModal = function() {
+            editMode.vehicle = false;
+            editMode.currentId = null;
+            document.getElementById('vehicleModalTitle').textContent = 'Aggiungi Nuovo Veicolo';
+            document.getElementById('vehicleSubmitBtn').textContent = 'Salva Veicolo';
+            document.getElementById('addVehicleForm').reset();
+            openModal('addVehicleModal');
+        };
+
+        window.editVehicle = async function(vehicleId) {
+            if (!userId) return;
+            const vehicleDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/vehicles/${vehicleId}`;
+            try {
+                const docSnap = await getDoc(doc(db, vehicleDocPath));
+                if (docSnap.exists()) {
+                    const vehicle = docSnap.data();
+                    editMode.vehicle = true;
+                    editMode.currentId = vehicleId;
+                    
+                    document.getElementById('vehicleModalTitle').textContent = 'Modifica Veicolo';
+                    document.getElementById('vehicleSubmitBtn').textContent = 'Aggiorna Veicolo';
+                    
+                    // Pre-populate form
+                    document.getElementById('vehicleMake').value = vehicle.make || '';
+                    document.getElementById('vehicleModel').value = vehicle.model || '';
+                    document.getElementById('vehicleYear').value = vehicle.year || '';
+                    document.getElementById('vehicleLicensePlate').value = vehicle.licensePlate || '';
+                    document.getElementById('vehicleVin').value = vehicle.vin || '';
+                    document.getElementById('vehicleEngineType').value = vehicle.engineType || '';
+                    document.getElementById('vehicleNotes').value = vehicle.notes || '';
+                    
+                    openModal('addVehicleModal');
+                } else {
+                    showFeedbackMessage("Veicolo non trovato.", 'error');
+                }
+            } catch (error) {
+                console.error("Errore nel caricare i dati del veicolo:", error);
+                showFeedbackMessage("Errore nel caricare i dati: " + error.message, 'error');
+            }
+        };
+
         addVehicleForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!userId || !currentCustomerId) {
+            if (!userId || (!currentCustomerId && !editMode.vehicle)) {
                  showFeedbackMessage("Seleziona un cliente prima di aggiungere un veicolo.", 'error');
                 return;
             }
-            const vehiclesColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/vehicles`;
+
+            const vehicleData = {
+                make: document.getElementById('vehicleMake').value,
+                model: document.getElementById('vehicleModel').value,
+                year: document.getElementById('vehicleYear').value,
+                licensePlate: document.getElementById('vehicleLicensePlate').value.toUpperCase(),
+                vin: document.getElementById('vehicleVin').value.toUpperCase(),
+                engineType: document.getElementById('vehicleEngineType').value,
+                notes: document.getElementById('vehicleNotes').value
+            };
+
             try {
-                await addDoc(collection(db, vehiclesColPath), {
-                    customerId: currentCustomerId,
-                    make: document.getElementById('vehicleMake').value,
-                    model: document.getElementById('vehicleModel').value,
-                    year: document.getElementById('vehicleYear').value,
-                    licensePlate: document.getElementById('vehicleLicensePlate').value.toUpperCase(),
-                    vin: document.getElementById('vehicleVin').value.toUpperCase(),
-                    engineType: document.getElementById('vehicleEngineType').value,
-                    notes: document.getElementById('vehicleNotes').value,
-                    createdAt: serverTimestamp()
-                });
+                if (editMode.vehicle && editMode.currentId) {
+                    // Update existing vehicle
+                    const vehicleDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/vehicles/${editMode.currentId}`;
+                    await updateDoc(doc(db, vehicleDocPath), {
+                        ...vehicleData,
+                        updatedAt: serverTimestamp()
+                    });
+                    showFeedbackMessage("Veicolo aggiornato con successo!", 'success');
+                } else {
+                    // Add new vehicle
+                    const vehiclesColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/vehicles`;
+                    await addDoc(collection(db, vehiclesColPath), {
+                        ...vehicleData,
+                        customerId: currentCustomerId,
+                        createdAt: serverTimestamp()
+                    });
+                    showFeedbackMessage("Veicolo aggiunto con successo!", 'success');
+                }
                 closeModal('addVehicleModal');
-                showFeedbackMessage("Veicolo aggiunto con successo!", 'success');
             } catch (error) {
-                console.error("Errore nell'aggiungere il veicolo: ", error);
-                showFeedbackMessage("Errore aggiunta veicolo: " + error.message, 'error');
+                console.error("Errore nel salvare il veicolo: ", error);
+                showFeedbackMessage("Errore salvataggio veicolo: " + error.message, 'error');
             }
         });
 
@@ -703,8 +829,9 @@
                                     <strong class="text-blue-700">Data: ${new Date(work.date).toLocaleDateString('it-IT')}</strong>
                                     <p class="text-sm text-gray-600 mt-1"><strong>Costo:</strong> € ${parseFloat(work.cost || 0).toFixed(2)}</p>
                                 </div>
-                                <div>
-                                     <button onclick="event.stopPropagation(); viewWorkDetails('${work.id}')" class="text-blue-500 hover:text-blue-700"><i class="fas fa-eye"></i> Dettagli</button>
+                                <div class="flex space-x-2">
+                                    <button onclick="event.stopPropagation(); editWork('${work.id}')" class="text-orange-500 hover:text-orange-700" title="Modifica"><i class="fas fa-edit"></i></button>
+                                    <button onclick="event.stopPropagation(); viewWorkDetails('${work.id}')" class="text-blue-500 hover:text-blue-700" title="Visualizza"><i class="fas fa-eye"></i></button>
                                 </div>
                             </div>
                             <div class="mt-2">
@@ -729,9 +856,65 @@
             });
         }
 
+        // Work modal functions
+        window.openAddWorkModal = function() {
+            editMode.work = false;
+            editMode.currentId = null;
+            document.getElementById('workModalTitle').textContent = 'Aggiungi Nuovo Lavoro';
+            document.getElementById('workSubmitBtn').textContent = 'Salva Lavoro';
+            document.getElementById('addWorkForm').reset();
+            openModal('addWorkModal');
+        };
+
+        window.editWork = async function(workId) {
+            if (!userId) return;
+            const workDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/work_entries/${workId}`;
+            try {
+                const docSnap = await getDoc(doc(db, workDocPath));
+                if (docSnap.exists()) {
+                    const work = docSnap.data();
+                    editMode.work = true;
+                    editMode.currentId = workId;
+                    
+                    document.getElementById('workModalTitle').textContent = 'Modifica Lavoro';
+                    document.getElementById('workSubmitBtn').textContent = 'Aggiorna Lavoro';
+                    
+                    // Pre-populate form
+                    document.getElementById('workDate').value = work.date || '';
+                    document.getElementById('workDescription').value = work.description || '';
+                    document.getElementById('workPartsToReplace').value = work.partsToReplace || '';
+                    document.getElementById('workPartsUsed').value = work.partsUsed || '';
+                    document.getElementById('workCost').value = work.cost || '';
+                    document.getElementById('workMechanicNotes').value = work.mechanicNotes || '';
+                    
+                    // Pre-populate checklist if exists
+                    if (work.checklistIngresso) {
+                        const cl = work.checklistIngresso;
+                        document.getElementById('workChecklistKm').value = cl.kmIngresso || '';
+                        document.getElementById('workChecklistFuel').value = cl.livelloCarburante || '';
+                        document.getElementById('workChecklistLightsFront').checked = cl.luciAnterioriOk || false;
+                        document.getElementById('workChecklistLightsRear').checked = cl.luciPosterioriOk || false;
+                        document.getElementById('workChecklistIndicators').checked = cl.frecceOk || false;
+                        document.getElementById('workChecklistOilLevel').checked = cl.livelloOlioOk || false;
+                        document.getElementById('workChecklistCoolantLevel').checked = cl.livelloLiquidoRaffreddamentoOk || false;
+                        document.getElementById('workChecklistTirePressureNotes').value = cl.pressionePneumaticiInfo || '';
+                        document.getElementById('workChecklistBodyDamageNotes').value = cl.danniCarrozzeriaNote || '';
+                        document.getElementById('workChecklistPersonalItemsNotes').value = cl.oggettiPersonaliNote || '';
+                    }
+                    
+                    openModal('addWorkModal');
+                } else {
+                    showFeedbackMessage("Lavoro non trovato.", 'error');
+                }
+            } catch (error) {
+                console.error("Errore nel caricare i dati del lavoro:", error);
+                showFeedbackMessage("Errore nel caricare i dati: " + error.message, 'error');
+            }
+        };
+
         addWorkForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!userId || !currentVehicleId) {
+            if (!userId || (!currentVehicleId && !editMode.work)) {
                 showFeedbackMessage("Seleziona un veicolo prima di aggiungere un lavoro.", 'error');
                 return;
             }
@@ -749,101 +932,42 @@
                 oggettiPersonaliNote: document.getElementById('workChecklistPersonalItemsNotes').value,
             };
 
-            const worksColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/work_entries`;
+            const workData = {
+                date: document.getElementById('workDate').value,
+                description: document.getElementById('workDescription').value,
+                partsToReplace: document.getElementById('workPartsToReplace').value,
+                partsUsed: document.getElementById('workPartsUsed').value,
+                cost: parseFloat(document.getElementById('workCost').value) || 0,
+                mechanicNotes: document.getElementById('workMechanicNotes').value,
+                checklistIngresso: checklistIngresso
+            };
+
             try {
-                await addDoc(collection(db, worksColPath), {
-                    vehicleId: currentVehicleId,
-                    date: document.getElementById('workDate').value,
-                    description: document.getElementById('workDescription').value,
-                    partsToReplace: document.getElementById('workPartsToReplace').value, // Nuovo campo salvato
-                    partsUsed: document.getElementById('workPartsUsed').value, 
-                    cost: parseFloat(document.getElementById('workCost').value) || 0,
-                    mechanicNotes: document.getElementById('workMechanicNotes').value,
-                    checklistIngresso: checklistIngresso, 
-                    createdAt: serverTimestamp()
-                });
+                if (editMode.work && editMode.currentId) {
+                    // Update existing work
+                    const workDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/work_entries/${editMode.currentId}`;
+                    await updateDoc(doc(db, workDocPath), {
+                        ...workData,
+                        updatedAt: serverTimestamp()
+                    });
+                    showFeedbackMessage("Lavoro aggiornato con successo!", 'success');
+                } else {
+                    // Add new work
+                    const worksColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/work_entries`;
+                    await addDoc(collection(db, worksColPath), {
+                        ...workData,
+                        vehicleId: currentVehicleId,
+                        createdAt: serverTimestamp()
+                    });
+                    showFeedbackMessage("Lavoro aggiunto con successo!", 'success');
+                }
                 closeModal('addWorkModal');
-                showFeedbackMessage("Lavoro aggiunto con successo!", 'success');
             } catch (error) {
-                console.error("Errore nell'aggiungere il lavoro: ", error);
-                showFeedbackMessage("Errore aggiunta lavoro: " + error.message, 'error');
+                console.error("Errore nel salvare il lavoro: ", error);
+                showFeedbackMessage("Errore salvataggio lavoro: " + error.message, 'error');
             }
         });
         
-        window.viewWorkDetails = async function(workId) {
-            if (!userId) return;
-            const workDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/work_entries/${workId}`;
-            try {
-                const docSnap = await getDoc(doc(db, workDocPath));
-                if (docSnap.exists()) {
-                    const work = docSnap.data();
-                    const partsToReplaceList = work.partsToReplace ? work.partsToReplace.split('\n').map(p => `<li>- ${p.trim()}</li>`).join('') : 'Nessuno';
-                    const partsUsedList = work.partsUsed ? work.partsUsed.split('\n').map(p => `<li>- ${p.trim()}</li>`).join('') : 'Nessuno';
-                    
-                    let checklistHtml = '';
-                    if (work.checklistIngresso) {
-                        const cl = work.checklistIngresso;
-                        checklistHtml = `
-                            <div class="mt-4 pt-3 border-t border-gray-200">
-                                <h4 class="text-md font-semibold text-gray-800 mb-2">Checklist Ingresso Veicolo:</h4>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 text-sm">
-                                    <p><strong>Chilometraggio:</strong> ${cl.kmIngresso !== null && cl.kmIngresso !== undefined ? cl.kmIngresso + ' km' : 'N/D'}</p>
-                                    <p><strong>Livello Carburante:</strong> ${cl.livelloCarburante || 'N/D'}</p>
-                                    <p><strong>Luci Anteriori:</strong> ${cl.luciAnterioriOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
-                                    <p><strong>Luci Posteriori:</strong> ${cl.luciPosterioriOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
-                                    <p><strong>Frecce:</strong> ${cl.frecceOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
-                                    <p><strong>Livello Olio:</strong> ${cl.livelloOlioOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
-                                    <p><strong>Livello Liquido Raff.:</strong> ${cl.livelloLiquidoRaffreddamentoOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
-                                </div>
-                                <p class="mt-2"><strong>Note Pneumatici:</strong> ${cl.pressionePneumaticiInfo || 'Nessuna nota'}</p>
-                                <div class="mt-2">
-                                    <p><strong>Note Danni Carrozzeria:</strong></p>
-                                    <p class="whitespace-pre-wrap ml-2 p-1 bg-gray-50 rounded text-xs">${cl.danniCarrozzeriaNote || 'Nessuna nota'}</p>
-                                </div>
-                                <div class="mt-2">
-                                    <p><strong>Note Oggetti Personali:</strong></p>
-                                    <p class="whitespace-pre-wrap ml-2 p-1 bg-gray-50 rounded text-xs">${cl.oggettiPersonaliNote || 'Nessuna nota'}</p>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        checklistHtml = '<p class="mt-3 pt-3 border-t"><strong>Checklist Ingresso:</strong> Non compilata.</p>';
-                    }
-
-                    detailsModalTitle.textContent = `Dettagli Lavoro del ${new Date(work.date).toLocaleDateString('it-IT')}`;
-                    detailsModalBody.innerHTML = `
-                        <p><strong>Data:</strong> ${new Date(work.date).toLocaleDateString('it-IT')}</p>
-                        <div class="mt-2">
-                            <p><strong>Descrizione Lavoro:</strong></p>
-                            <p class="whitespace-pre-wrap ml-2 p-1 bg-gray-50 rounded text-xs">${work.description}</p>
-                        </div>
-                        <div class="mt-2">
-                            <p><strong>Ricambi da Sostituire (Preventivo):</strong></p>
-                            <ul class="list-disc list-inside ml-4 text-xs">${partsToReplaceList}</ul>
-                        </div>
-                        <div class="mt-2">
-                            <p><strong>Ricambi Effettivamente Utilizzati:</strong></p>
-                            <ul class="list-disc list-inside ml-4 text-xs">${partsUsedList}</ul>
-                        </div>
-                        <p class="mt-2"><strong>Costo:</strong> € ${parseFloat(work.cost || 0).toFixed(2)}</p>
-                        <div class="mt-2">
-                            <p><strong>Note Meccanico:</strong></p>
-                            <p class="whitespace-pre-wrap ml-2 p-1 bg-gray-50 rounded text-xs">${work.mechanicNotes || 'Nessuna nota'}</p>
-                        </div>
-                        ${checklistHtml}
-                    `;
-                    detailsModalDeleteButton.onclick = () => confirmDelete('work', workId, `Lavoro del ${new Date(work.date).toLocaleDateString('it-IT')}`);
-                    detailsModalDeleteButton.classList.remove('hidden');
-                    openModal('viewDetailsModal');
-                } else {
-                    showFeedbackMessage("Lavoro non trovato.", 'error');
-                }
-            } catch (error) {
-                console.error("Errore nel visualizzare i dettagli del lavoro:", error);
-                 showFeedbackMessage("Errore visualizzazione dettagli: " + error.message, 'error');
-            }
-        };
-
         // --- FUNZIONI DI ELIMINAZIONE ---
         function confirmDelete(type, id, name) {
             showFeedbackMessage(`Stai per eliminare "${name}". Clicca di nuovo ELIMINA nel popup se sei sicuro.`, 'error', 6000);
