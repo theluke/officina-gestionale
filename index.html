@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Clienti Officina</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Grigio chiaro per lo sfondo */
+        }
+        .modal {
+            display: none; /* Nascosto di default */
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5); /* Sfondo semi-trasparente */
+        }
+        .modal-content {
+            background-color: #ffffff;
+            margin: 5% auto; /* Ridotto margine superiore per modal più lunghi */
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 700px; /* Aumentata larghezza massima per checklist */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .tab-button {
+            transition: background-color 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #4f46e5; /* Indigo più scuro per la tab attiva */
+            color: white;
+        }
+        .list-item:hover {
+            background-color: #e5e7eb; /* Grigio leggermente più scuro al passaggio del mouse */
+        }
+        /* Stili per i messaggi di feedback */
+        #feedbackMessage {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        #feedbackMessage.show {
+            opacity: 1;
+        }
+        #feedbackMessage.success {
+            background-color: #28a745; /* Verde per successo */
+        }
+        #feedbackMessage.error {
+            background-color: #dc3545; /* Rosso per errore */
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="container mx-auto max-w-7xl bg-white p-6 rounded-lg shadow-xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl font-bold text-gray-800">Database Clienti Officina</h1>
+            <p class="text-sm text-gray-500 mt-2">User ID: <span id="userIdDisplay">Caricamento...</span></p>
+        </header>
+
+        <!-- Messaggio di Feedback -->
+        <div id="feedbackMessage"></div>
+
+        <!-- Selettore Tab Principale -->
+        <div class="mb-6 border-b border-gray-200">
+            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                <button id="tabClientiBtn" onclick="showTab('clienti')" class="tab-button active whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-lg text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    <i class="fas fa-users mr-2"></i>Clienti
+                </button>
+                <button id="tabVeicoliBtn" onclick="showTab('veicoli')" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-lg text-gray-500 hover:text-gray-700 hover:border-gray-300" disabled>
+                    <i class="fas fa-car mr-2"></i>Veicoli (<span id="selectedCustomerForVehicles">Nessun cliente</span>)
+                </button>
+                <button id="tabLavoriBtn" onclick="showTab('lavori')" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 border-transparent font-medium text-lg text-gray-500 hover:text-gray-700 hover:border-gray-300" disabled>
+                    <i class="fas fa-tools mr-2"></i>Lavori (<span id="selectedVehicleForWorks">Nessun veicolo</span>)
+                </button>
+            </nav>
+        </div>
+
+        <!-- Contenuto delle Tab -->
+        <!-- Sezione Clienti -->
+        <div id="clientiContent" class="tab-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-semibold text-gray-700">Elenco Clienti</h2>
+                <button onclick="openModal('addCustomerModal')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">
+                    <i class="fas fa-plus mr-2"></i>Aggiungi Cliente
+                </button>
+            </div>
+            <div id="customersList" class="bg-gray-50 p-4 rounded-lg shadow-inner min-h-[200px]">
+                <!-- Lista clienti verrà popolata da JS -->
+                <p class="text-gray-500">Nessun cliente trovato. Aggiungine uno!</p>
+            </div>
+        </div>
+
+        <!-- Sezione Veicoli -->
+        <div id="veicoliContent" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-semibold text-gray-700">Elenco Veicoli per <span id="customerNameForVehicles" class="text-indigo-600"></span></h2>
+                <button onclick="openModal('addVehicleModal')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">
+                    <i class="fas fa-plus mr-2"></i>Aggiungi Veicolo
+                </button>
+            </div>
+            <div id="vehiclesList" class="bg-gray-50 p-4 rounded-lg shadow-inner min-h-[200px]">
+                <!-- Lista veicoli verrà popolata da JS -->
+                 <p class="text-gray-500">Nessun veicolo trovato per questo cliente.</p>
+            </div>
+        </div>
+
+        <!-- Sezione Lavori -->
+        <div id="lavoriContent" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-semibold text-gray-700">Storico Lavori per <span id="vehicleIdentifierForWorks" class="text-indigo-600"></span></h2>
+                <button onclick="openModal('addWorkModal')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">
+                    <i class="fas fa-plus mr-2"></i>Aggiungi Lavoro
+                </button>
+            </div>
+            <div id="worksList" class="bg-gray-50 p-4 rounded-lg shadow-inner min-h-[200px]">
+                <!-- Lista lavori verrà popolata da JS -->
+                <p class="text-gray-500">Nessun lavoro trovato per questo veicolo.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Aggiungi Cliente -->
+    <div id="addCustomerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('addCustomerModal')">&times;</span>
+            <h3 class="text-xl font-semibold mb-4 text-gray-700">Aggiungi Nuovo Cliente</h3>
+            <form id="addCustomerForm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <input type="text" id="customerName" placeholder="Nome" class="p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" required>
+                    <input type="text" id="customerSurname" placeholder="Cognome" class="p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <input type="tel" id="customerPhone" placeholder="Telefono" class="p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                    <input type="email" id="customerEmail" placeholder="Email" class="p-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <textarea id="customerAddress" placeholder="Indirizzo" rows="3" class="w-full p-2 border border-gray-300 rounded-md mb-4 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">Salva Cliente</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Aggiungi Veicolo -->
+    <div id="addVehicleModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('addVehicleModal')">&times;</span>
+            <h3 class="text-xl font-semibold mb-4 text-gray-700">Aggiungi Nuovo Veicolo</h3>
+            <form id="addVehicleForm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <input type="text" id="vehicleMake" placeholder="Marca" class="p-2 border border-gray-300 rounded-md" required>
+                    <input type="text" id="vehicleModel" placeholder="Modello" class="p-2 border border-gray-300 rounded-md" required>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <input type="number" id="vehicleYear" placeholder="Anno" class="p-2 border border-gray-300 rounded-md">
+                    <input type="text" id="vehicleLicensePlate" placeholder="Targa" class="p-2 border border-gray-300 rounded-md" required>
+                </div>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <input type="text" id="vehicleVin" placeholder="Numero di Telaio (VIN)" class="p-2 border border-gray-300 rounded-md">
+                    <input type="text" id="vehicleEngineType" placeholder="Tipo Motore/Cilindrata" class="p-2 border border-gray-300 rounded-md">
+                </div>
+                <textarea id="vehicleNotes" placeholder="Note aggiuntive sul veicolo" rows="3" class="w-full p-2 border border-gray-300 rounded-md mb-4"></textarea>
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Salva Veicolo</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Aggiungi Lavoro -->
+    <div id="addWorkModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('addWorkModal')">&times;</span>
+            <h3 class="text-xl font-semibold mb-4 text-gray-700">Aggiungi Nuovo Lavoro</h3>
+            <form id="addWorkForm">
+                <input type="date" id="workDate" class="w-full p-2 border border-gray-300 rounded-md mb-4" required>
+                <textarea id="workDescription" placeholder="Descrizione del lavoro eseguito" rows="3" class="w-full p-2 border border-gray-300 rounded-md mb-4" required></textarea>
+                
+                <textarea id="workPartsToReplace" placeholder="Ricambi da Sostituire (Preventivo - uno per riga)" rows="3" class="w-full p-2 border border-gray-300 rounded-md mb-4"></textarea>
+                <textarea id="workPartsUsed" placeholder="Ricambi Effettivamente Utilizzati (uno per riga)" rows="3" class="w-full p-2 border border-gray-300 rounded-md mb-4"></textarea>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <input type="number" step="0.01" id="workCost" placeholder="Costo (€)" class="p-2 border border-gray-300 rounded-md">
+                </div>
+                <textarea id="workMechanicNotes" placeholder="Note del meccanico" rows="2" class="w-full p-2 border border-gray-300 rounded-md mb-4"></textarea>
+
+                <!-- Checklist Ingresso Veicolo -->
+                <h4 class="text-lg font-semibold mt-6 mb-3 text-gray-600 border-t pt-4">Checklist Ingresso Veicolo</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <input type="number" id="workChecklistKm" placeholder="Chilometraggio Ingresso (es. 123456)" class="p-2 border border-gray-300 rounded-md">
+                    <select id="workChecklistFuel" class="p-2 border border-gray-300 rounded-md">
+                        <option value="">Livello Carburante...</option>
+                        <option value="Riserva">Riserva</option>
+                        <option value="1/4">1/4</option>
+                        <option value="1/2">1/2</option>
+                        <option value="3/4">3/4</option>
+                        <option value="Pieno">Pieno</option>
+                    </select>
+                </div>
+
+                <p class="font-medium text-gray-700 mb-1">Stato Luci:</p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-4 gap-y-2 mb-4">
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" id="workChecklistLightsFront" class="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4">
+                        <span class="text-sm">Luci Anteriori OK</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" id="workChecklistLightsRear" class="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4">
+                        <span class="text-sm">Luci Posteriori OK</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" id="workChecklistIndicators" class="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4">
+                        <span class="text-sm">Frecce OK</span>
+                    </label>
+                </div>
+
+                <p class="font-medium text-gray-700 mb-1">Livelli Liquidi:</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 mb-4">
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" id="workChecklistOilLevel" class="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4">
+                        <span class="text-sm">Livello Olio OK</span>
+                    </label>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" id="workChecklistCoolantLevel" class="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4">
+                        <span class="text-sm">Livello Liquido Raff. OK</span>
+                    </label>
+                </div>
+
+                <textarea id="workChecklistTirePressureNotes" placeholder="Note Pressione/Stato Pneumatici" rows="2" class="w-full p-2 border border-gray-300 rounded-md mb-4 text-sm"></textarea>
+                <textarea id="workChecklistBodyDamageNotes" placeholder="Note Danni Carrozzeria (es. graffio paraurti ant. sx)" rows="3" class="w-full p-2 border border-gray-300 rounded-md mb-4 text-sm"></textarea>
+                <textarea id="workChecklistPersonalItemsNotes" placeholder="Oggetti Personali Lasciati (es. occhiali da sole, cavo USB)" rows="3" class="w-full p-2 border border-gray-300 rounded-md mb-4 text-sm"></textarea>
+                <!-- Fine Checklist -->
+
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">Salva Lavoro</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Visualizza Dettagli (Generico) -->
+    <div id="viewDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('viewDetailsModal')">&times;</span>
+            <h3 id="detailsModalTitle" class="text-xl font-semibold mb-4 text-gray-700">Dettagli</h3>
+            <div id="detailsModalBody" class="text-gray-600 space-y-2 text-sm">
+                <!-- Contenuto dinamico -->
+            </div>
+             <div class="mt-6 flex justify-end space-x-3">
+                <button id="detailsModalDeleteButton" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
+                    <i class="fas fa-trash-alt mr-2"></i>Elimina
+                </button>
+                <button onclick="closeModal('viewDetailsModal')" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline">
+                    Chiudi
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="module">
+        // Importazioni Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, addDoc, getDoc, deleteDoc, collection, query, where, onSnapshot, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Configurazione Firebase (verrà iniettata da Canvas se disponibile)
+		const firebaseConfig = {
+		  apiKey: "AIzaSyCWpP2f5xihN_RVRpdbrVXl4UpUQKh61pc",
+		  authDomain: "db-clienti-bbfc1.firebaseapp.com",
+		  projectId: "db-clienti-bbfc1",
+		  storageBucket: "db-clienti-bbfc1.firebasestorage.app",
+		  messagingSenderId: "680013791022",
+		  appId: "1:680013791022:web:8ae25f2dbfe20dec9b44bf",
+		  measurementId: "G-F50H48R9DG"
+		};
+
+
+        // Inizializzazione Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // ID dell'app (verrà iniettato da Canvas se disponibile)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-officina-app';
+        let userId = null; 
+
+        // Stato dell'applicazione
+        let currentCustomerId = null;
+        let currentCustomerName = null;
+        let currentVehicleId = null;
+        let currentVehicleIdentifier = null; 
+
+        // Elementi UI
+        const customersListEl = document.getElementById('customersList');
+        const vehiclesListEl = document.getElementById('vehiclesList');
+        const worksListEl = document.getElementById('worksList');
+        const addCustomerForm = document.getElementById('addCustomerForm');
+        const addVehicleForm = document.getElementById('addVehicleForm');
+        const addWorkForm = document.getElementById('addWorkForm');
+        const userIdDisplay = document.getElementById('userIdDisplay');
+
+        const tabClientiBtn = document.getElementById('tabClientiBtn');
+        const tabVeicoliBtn = document.getElementById('tabVeicoliBtn');
+        const tabLavoriBtn = document.getElementById('tabLavoriBtn');
+        const selectedCustomerForVehiclesEl = document.getElementById('selectedCustomerForVehicles');
+        const customerNameForVehiclesEl = document.getElementById('customerNameForVehicles');
+        const selectedVehicleForWorksEl = document.getElementById('selectedVehicleForWorks');
+        const vehicleIdentifierForWorksEl = document.getElementById('vehicleIdentifierForWorks');
+
+        const detailsModalTitle = document.getElementById('detailsModalTitle');
+        const detailsModalBody = document.getElementById('detailsModalBody');
+        const detailsModalDeleteButton = document.getElementById('detailsModalDeleteButton');
+
+        // Funzione per mostrare messaggi di feedback
+        function showFeedbackMessage(message, type = 'success', duration = 3000) {
+            const feedbackEl = document.getElementById('feedbackMessage');
+            feedbackEl.textContent = message;
+            feedbackEl.className = ''; 
+            feedbackEl.classList.add('show', type);
+            setTimeout(() => {
+                feedbackEl.classList.remove('show');
+            }, duration);
+        }
+
+        // Gestione Autenticazione
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+                userIdDisplay.textContent = userId;
+                console.log("Utente autenticato:", userId);
+                loadCustomers(); 
+            } else {
+                console.log("Nessun utente autenticato, tentativo di login.");
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        console.log("Tentativo di login con token personalizzato.");
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        console.log("Tentativo di login anonimo.");
+                        await signInAnonymously(auth);
+                    }
+                } catch (error) {
+                    console.error("Errore di autenticazione:", error);
+                    userIdDisplay.textContent = "Errore di autenticazione";
+                    showFeedbackMessage("Errore di autenticazione: " + error.message, 'error');
+                }
+            }
+        });
+        
+        // Funzioni per i Tab
+        window.showTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.add('hidden'));
+            document.getElementById(tabName + 'Content').classList.remove('hidden');
+
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active', 'border-indigo-500', 'text-indigo-600'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300'));
+            
+            const activeBtn = document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1) + 'Btn');
+            activeBtn.classList.add('active', 'border-indigo-500', 'text-indigo-600');
+            activeBtn.classList.remove('border-transparent', 'text-gray-500');
+        }
+
+        // Funzioni per i Modal
+        window.openModal = function(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+        window.closeModal = function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                 modal.style.display = 'none';
+                // Resetta i form quando il modal viene chiuso
+                if (modalId === 'addCustomerModal') addCustomerForm.reset();
+                if (modalId === 'addVehicleModal') addVehicleForm.reset();
+                if (modalId === 'addWorkModal') {
+                    addWorkForm.reset(); 
+                }
+            }
+        }
+        // Chiudi modal cliccando fuori
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                closeModal(event.target.id);
+            }
+        }
+
+        // --- GESTIONE CLIENTI ---
+        async function loadCustomers() {
+            if (!userId) {
+                console.log("UserID non disponibile, impossibile caricare i clienti.");
+                customersListEl.innerHTML = '<p class="text-red-500">Autenticazione in corso o fallita. Riprova tra poco.</p>';
+                return;
+            }
+            const customersColPath = `artifacts/${appId}/users/${userId}/customers`;
+            const q = query(collection(db, customersColPath)); 
+
+            onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    customersListEl.innerHTML = '<p class="text-gray-500">Nessun cliente trovato. Aggiungine uno!</p>';
+                    return;
+                }
+                let html = '<ul class="space-y-3">';
+                const customers = [];
+                snapshot.forEach(doc => customers.push({ id: doc.id, ...doc.data() }));
+                
+                customers.sort((a, b) => {
+                    const surnameA = a.surname ? a.surname.toLowerCase() : '';
+                    const surnameB = b.surname ? b.surname.toLowerCase() : '';
+                    const nameA = a.name ? a.name.toLowerCase() : '';
+                    const nameB = b.name ? b.name.toLowerCase() : '';
+                    if (surnameA < surnameB) return -1;
+                    if (surnameA > surnameB) return 1;
+                    if (nameA < nameB) return -1;
+                    if (nameA > nameB) return 1;
+                    return 0;
+                });
+
+                customers.forEach(customer => {
+                    html += `
+                        <li data-id="${customer.id}" class="list-item p-4 bg-white rounded-md shadow cursor-pointer flex justify-between items-center">
+                            <div>
+                                <strong class="text-indigo-700">${customer.surname} ${customer.name}</strong>
+                                <p class="text-sm text-gray-600">${customer.phone || ''} - ${customer.email || ''}</p>
+                            </div>
+                            <div>
+                                <button onclick="event.stopPropagation(); viewCustomerDetails('${customer.id}')" class="text-blue-500 hover:text-blue-700 mr-2"><i class="fas fa-eye"></i></button>
+                                <button onclick="event.stopPropagation(); selectCustomer('${customer.id}', '${customer.name} ${customer.surname}')" class="text-green-500 hover:text-green-700"><i class="fas fa-car"></i> Veicoli</button>
+                            </div>
+                        </li>`;
+                });
+                html += '</ul>';
+                customersListEl.innerHTML = html;
+
+                document.querySelectorAll('#customersList li').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const customerId = this.dataset.id;
+                        const customerData = customers.find(c => c.id === customerId);
+                        if (customerData) {
+                           selectCustomer(customerId, `${customerData.name} ${customerData.surname}`);
+                        }
+                    });
+                });
+
+            }, (error) => {
+                console.error("Errore nel caricare i clienti: ", error);
+                customersListEl.innerHTML = `<p class="text-red-500">Errore nel caricamento dei clienti: ${error.message}</p>`;
+                showFeedbackMessage("Errore caricamento clienti: " + error.message, 'error');
+            });
+        }
+
+        addCustomerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!userId) {
+                showFeedbackMessage("Utente non autenticato. Impossibile salvare.", 'error');
+                return;
+            }
+            const customersColPath = `artifacts/${appId}/users/${userId}/customers`;
+            try {
+                await addDoc(collection(db, customersColPath), {
+                    name: document.getElementById('customerName').value,
+                    surname: document.getElementById('customerSurname').value,
+                    phone: document.getElementById('customerPhone').value,
+                    email: document.getElementById('customerEmail').value,
+                    address: document.getElementById('customerAddress').value,
+                    createdAt: serverTimestamp()
+                });
+                closeModal('addCustomerModal');
+                showFeedbackMessage("Cliente aggiunto con successo!", 'success');
+            } catch (error) {
+                console.error("Errore nell'aggiungere il cliente: ", error);
+                showFeedbackMessage("Errore aggiunta cliente: " + error.message, 'error');
+            }
+        });
+
+        window.viewCustomerDetails = async function(customerId) {
+            if (!userId) return;
+            const customerDocPath = `artifacts/${appId}/users/${userId}/customers/${customerId}`;
+            try {
+                const docSnap = await getDoc(doc(db, customerDocPath));
+                if (docSnap.exists()) {
+                    const customer = docSnap.data();
+                    detailsModalTitle.textContent = `Dettagli Cliente: ${customer.name} ${customer.surname}`;
+                    detailsModalBody.innerHTML = `
+                        <p><strong>Nome:</strong> ${customer.name}</p>
+                        <p><strong>Cognome:</strong> ${customer.surname}</p>
+                        <p><strong>Telefono:</strong> ${customer.phone || 'N/D'}</p>
+                        <p><strong>Email:</strong> ${customer.email || 'N/D'}</p>
+                        <p><strong>Indirizzo:</strong> ${customer.address || 'N/D'}</p>
+                    `;
+                    detailsModalDeleteButton.onclick = () => confirmDelete('customer', customerId, `${customer.name} ${customer.surname}`);
+                    detailsModalDeleteButton.classList.remove('hidden');
+                    openModal('viewDetailsModal');
+                } else {
+                    showFeedbackMessage("Cliente non trovato.", 'error');
+                }
+            } catch (error) {
+                console.error("Errore nel visualizzare i dettagli del cliente:", error);
+                showFeedbackMessage("Errore visualizzazione dettagli: " + error.message, 'error');
+            }
+        };
+        
+        window.selectCustomer = function(customerId, customerName) {
+            currentCustomerId = customerId;
+            currentCustomerName = customerName;
+            
+            selectedCustomerForVehiclesEl.textContent = customerName;
+            customerNameForVehiclesEl.textContent = customerName;
+            tabVeicoliBtn.disabled = false;
+            
+            currentVehicleId = null;
+            currentVehicleIdentifier = null;
+            selectedVehicleForWorksEl.textContent = 'Nessun veicolo';
+            vehicleIdentifierForWorksEl.textContent = '';
+            tabLavoriBtn.disabled = true;
+            worksListEl.innerHTML = '<p class="text-gray-500">Seleziona un veicolo per vedere i lavori.</p>';
+
+            loadVehicles();
+            showTab('veicoli');
+        }
+
+        // --- GESTIONE VEICOLI ---
+        function loadVehicles() {
+            if (!userId || !currentCustomerId) {
+                vehiclesListEl.innerHTML = '<p class="text-gray-500">Seleziona un cliente per vedere i suoi veicoli.</p>';
+                return;
+            }
+            const vehiclesColPath = `artifacts/${appId}/users/${userId}/vehicles`;
+            const q = query(collection(db, vehiclesColPath), where("customerId", "==", currentCustomerId)); 
+
+            onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    vehiclesListEl.innerHTML = `<p class="text-gray-500">Nessun veicolo trovato per ${currentCustomerName}.</p>`;
+                    return;
+                }
+                let html = '<ul class="space-y-3">';
+                const vehicles = [];
+                snapshot.forEach(doc => vehicles.push({ id: doc.id, ...doc.data() }));
+
+                vehicles.sort((a, b) => {
+                    const plateA = a.licensePlate ? a.licensePlate.toLowerCase() : '';
+                    const plateB = b.licensePlate ? b.licensePlate.toLowerCase() : '';
+                    if (plateA < plateB) return -1;
+                    if (plateA > plateB) return 1;
+                    return 0;
+                });
+
+                vehicles.forEach(vehicle => {
+                    const vehicleDisplay = vehicle.licensePlate || `${vehicle.make} ${vehicle.model}`;
+                    html += `
+                        <li data-id="${vehicle.id}" class="list-item p-4 bg-white rounded-md shadow cursor-pointer flex justify-between items-center">
+                            <div>
+                                <strong class="text-green-700">${vehicle.make} ${vehicle.model} (${vehicle.year || 'N/A'})</strong>
+                                <p class="text-sm text-gray-600">Targa: ${vehicle.licensePlate || 'N/D'} - Telaio: ${vehicle.vin || 'N/D'}</p>
+                            </div>
+                             <div>
+                                <button onclick="event.stopPropagation(); viewVehicleDetails('${vehicle.id}')" class="text-blue-500 hover:text-blue-700 mr-2"><i class="fas fa-eye"></i></button>
+                                <button onclick="event.stopPropagation(); selectVehicle('${vehicle.id}', '${vehicleDisplay}')" class="text-purple-500 hover:text-purple-700"><i class="fas fa-tools"></i> Lavori</button>
+                            </div>
+                        </li>`;
+                });
+                html += '</ul>';
+                vehiclesListEl.innerHTML = html;
+
+                document.querySelectorAll('#vehiclesList li').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const vehicleId = this.dataset.id;
+                        const vehicleData = vehicles.find(v => v.id === vehicleId);
+                        if (vehicleData) {
+                            selectVehicle(vehicleId, vehicleData.licensePlate || `${vehicleData.make} ${vehicleData.model}`);
+                        }
+                    });
+                });
+
+            }, (error) => {
+                console.error("Errore nel caricare i veicoli: ", error);
+                vehiclesListEl.innerHTML = `<p class="text-red-500">Errore nel caricamento dei veicoli: ${error.message}</p>`;
+                showFeedbackMessage("Errore caricamento veicoli: " + error.message, 'error');
+            });
+        }
+
+        addVehicleForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!userId || !currentCustomerId) {
+                 showFeedbackMessage("Seleziona un cliente prima di aggiungere un veicolo.", 'error');
+                return;
+            }
+            const vehiclesColPath = `artifacts/${appId}/users/${userId}/vehicles`;
+            try {
+                await addDoc(collection(db, vehiclesColPath), {
+                    customerId: currentCustomerId,
+                    make: document.getElementById('vehicleMake').value,
+                    model: document.getElementById('vehicleModel').value,
+                    year: document.getElementById('vehicleYear').value,
+                    licensePlate: document.getElementById('vehicleLicensePlate').value.toUpperCase(),
+                    vin: document.getElementById('vehicleVin').value.toUpperCase(),
+                    engineType: document.getElementById('vehicleEngineType').value,
+                    notes: document.getElementById('vehicleNotes').value,
+                    createdAt: serverTimestamp()
+                });
+                closeModal('addVehicleModal');
+                showFeedbackMessage("Veicolo aggiunto con successo!", 'success');
+            } catch (error) {
+                console.error("Errore nell'aggiungere il veicolo: ", error);
+                showFeedbackMessage("Errore aggiunta veicolo: " + error.message, 'error');
+            }
+        });
+
+        window.viewVehicleDetails = async function(vehicleId) {
+            if (!userId) return;
+            const vehicleDocPath = `artifacts/${appId}/users/${userId}/vehicles/${vehicleId}`;
+            try {
+                const docSnap = await getDoc(doc(db, vehicleDocPath));
+                if (docSnap.exists()) {
+                    const vehicle = docSnap.data();
+                    detailsModalTitle.textContent = `Dettagli Veicolo: ${vehicle.make} ${vehicle.model} (${vehicle.licensePlate || 'N/D'})`;
+                    detailsModalBody.innerHTML = `
+                        <p><strong>Marca:</strong> ${vehicle.make}</p>
+                        <p><strong>Modello:</strong> ${vehicle.model}</p>
+                        <p><strong>Anno:</strong> ${vehicle.year || 'N/D'}</p>
+                        <p><strong>Targa:</strong> ${vehicle.licensePlate || 'N/D'}</p>
+                        <p><strong>VIN:</strong> ${vehicle.vin || 'N/D'}</p>
+                        <p><strong>Tipo Motore:</strong> ${vehicle.engineType || 'N/D'}</p>
+                        <p><strong>Note:</strong> ${vehicle.notes || 'Nessuna nota'}</p>
+                    `;
+                    detailsModalDeleteButton.onclick = () => confirmDelete('vehicle', vehicleId, `${vehicle.make} ${vehicle.model} (${vehicle.licensePlate || 'N/D'})`);
+                    detailsModalDeleteButton.classList.remove('hidden');
+                    openModal('viewDetailsModal');
+                } else {
+                    showFeedbackMessage("Veicolo non trovato.", 'error');
+                }
+            } catch (error) {
+                console.error("Errore nel visualizzare i dettagli del veicolo:", error);
+                showFeedbackMessage("Errore visualizzazione dettagli: " + error.message, 'error');
+            }
+        };
+
+        window.selectVehicle = function(vehicleId, vehicleIdentifier) {
+            currentVehicleId = vehicleId;
+            currentVehicleIdentifier = vehicleIdentifier;
+
+            selectedVehicleForWorksEl.textContent = vehicleIdentifier;
+            vehicleIdentifierForWorksEl.textContent = vehicleIdentifier;
+            tabLavoriBtn.disabled = false;
+            
+            loadWorks();
+            showTab('lavori');
+        }
+
+        // --- GESTIONE LAVORI ---
+        function loadWorks() {
+            if (!userId || !currentVehicleId) {
+                worksListEl.innerHTML = '<p class="text-gray-500">Seleziona un veicolo per vedere lo storico dei lavori.</p>';
+                return;
+            }
+            const worksColPath = `artifacts/${appId}/users/${userId}/work_entries`;
+            const q = query(collection(db, worksColPath), where("vehicleId", "==", currentVehicleId)); 
+
+            onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    worksListEl.innerHTML = `<p class="text-gray-500">Nessun lavoro trovato per ${currentVehicleIdentifier}.</p>`;
+                    return;
+                }
+                let html = '<ul class="space-y-3">';
+                const works = [];
+                snapshot.forEach(doc => works.push({ id: doc.id, ...doc.data() }));
+
+                works.sort((a, b) => {
+                    const dateA = a.date ? new Date(a.date) : new Date(0);
+                    const dateB = b.date ? new Date(b.date) : new Date(0);
+                    return dateB - dateA; 
+                });
+
+                works.forEach(work => {
+                    html += `
+                        <li data-id="${work.id}" class="list-item p-4 bg-white rounded-md shadow cursor-pointer">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <strong class="text-blue-700">Data: ${new Date(work.date).toLocaleDateString('it-IT')}</strong>
+                                    <p class="text-sm text-gray-600 mt-1"><strong>Costo:</strong> € ${parseFloat(work.cost || 0).toFixed(2)}</p>
+                                </div>
+                                <div>
+                                     <button onclick="event.stopPropagation(); viewWorkDetails('${work.id}')" class="text-blue-500 hover:text-blue-700"><i class="fas fa-eye"></i> Dettagli</button>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <p class="font-semibold text-gray-700">Descrizione:</p>
+                                <p class="text-sm text-gray-600 whitespace-pre-wrap">${work.description}</p>
+                            </div>
+                        </li>`;
+                });
+                html += '</ul>';
+                worksListEl.innerHTML = html;
+
+                document.querySelectorAll('#worksList li').forEach(item => {
+                    item.addEventListener('click', function() {
+                        viewWorkDetails(this.dataset.id);
+                    });
+                });
+
+            }, (error) => {
+                console.error("Errore nel caricare i lavori: ", error);
+                worksListEl.innerHTML = `<p class="text-red-500">Errore nel caricamento dei lavori: ${error.message}</p>`;
+                showFeedbackMessage("Errore caricamento lavori: " + error.message, 'error');
+            });
+        }
+
+        addWorkForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!userId || !currentVehicleId) {
+                showFeedbackMessage("Seleziona un veicolo prima di aggiungere un lavoro.", 'error');
+                return;
+            }
+
+            const checklistIngresso = {
+                kmIngresso: document.getElementById('workChecklistKm').value ? parseInt(document.getElementById('workChecklistKm').value) : null,
+                livelloCarburante: document.getElementById('workChecklistFuel').value,
+                luciAnterioriOk: document.getElementById('workChecklistLightsFront').checked,
+                luciPosterioriOk: document.getElementById('workChecklistLightsRear').checked,
+                frecceOk: document.getElementById('workChecklistIndicators').checked,
+                livelloOlioOk: document.getElementById('workChecklistOilLevel').checked,
+                livelloLiquidoRaffreddamentoOk: document.getElementById('workChecklistCoolantLevel').checked,
+                pressionePneumaticiInfo: document.getElementById('workChecklistTirePressureNotes').value,
+                danniCarrozzeriaNote: document.getElementById('workChecklistBodyDamageNotes').value,
+                oggettiPersonaliNote: document.getElementById('workChecklistPersonalItemsNotes').value,
+            };
+
+            const worksColPath = `artifacts/${appId}/users/${userId}/work_entries`;
+            try {
+                await addDoc(collection(db, worksColPath), {
+                    vehicleId: currentVehicleId,
+                    date: document.getElementById('workDate').value,
+                    description: document.getElementById('workDescription').value,
+                    partsToReplace: document.getElementById('workPartsToReplace').value, // Nuovo campo salvato
+                    partsUsed: document.getElementById('workPartsUsed').value, 
+                    cost: parseFloat(document.getElementById('workCost').value) || 0,
+                    mechanicNotes: document.getElementById('workMechanicNotes').value,
+                    checklistIngresso: checklistIngresso, 
+                    createdAt: serverTimestamp()
+                });
+                closeModal('addWorkModal');
+                showFeedbackMessage("Lavoro aggiunto con successo!", 'success');
+            } catch (error) {
+                console.error("Errore nell'aggiungere il lavoro: ", error);
+                showFeedbackMessage("Errore aggiunta lavoro: " + error.message, 'error');
+            }
+        });
+        
+        window.viewWorkDetails = async function(workId) {
+            if (!userId) return;
+            const workDocPath = `artifacts/${appId}/users/${userId}/work_entries/${workId}`;
+            try {
+                const docSnap = await getDoc(doc(db, workDocPath));
+                if (docSnap.exists()) {
+                    const work = docSnap.data();
+                    const partsToReplaceList = work.partsToReplace ? work.partsToReplace.split('\n').map(p => `<li>- ${p.trim()}</li>`).join('') : 'Nessuno';
+                    const partsUsedList = work.partsUsed ? work.partsUsed.split('\n').map(p => `<li>- ${p.trim()}</li>`).join('') : 'Nessuno';
+                    
+                    let checklistHtml = '';
+                    if (work.checklistIngresso) {
+                        const cl = work.checklistIngresso;
+                        checklistHtml = `
+                            <div class="mt-4 pt-3 border-t border-gray-200">
+                                <h4 class="text-md font-semibold text-gray-800 mb-2">Checklist Ingresso Veicolo:</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 text-sm">
+                                    <p><strong>Chilometraggio:</strong> ${cl.kmIngresso !== null && cl.kmIngresso !== undefined ? cl.kmIngresso + ' km' : 'N/D'}</p>
+                                    <p><strong>Livello Carburante:</strong> ${cl.livelloCarburante || 'N/D'}</p>
+                                    <p><strong>Luci Anteriori:</strong> ${cl.luciAnterioriOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
+                                    <p><strong>Luci Posteriori:</strong> ${cl.luciPosterioriOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
+                                    <p><strong>Frecce:</strong> ${cl.frecceOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
+                                    <p><strong>Livello Olio:</strong> ${cl.livelloOlioOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
+                                    <p><strong>Livello Liquido Raff.:</strong> ${cl.livelloLiquidoRaffreddamentoOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
+                                </div>
+                                <p class="mt-2"><strong>Note Pneumatici:</strong> ${cl.pressionePneumaticiInfo || 'Nessuna nota'}</p>
+                                <div class="mt-2">
+                                    <p><strong>Note Danni Carrozzeria:</strong></p>
+                                    <p class="whitespace-pre-wrap ml-2 p-1 bg-gray-50 rounded text-xs">${cl.danniCarrozzeriaNote || 'Nessuna nota'}</p>
+                                </div>
+                                <div class="mt-2">
+                                    <p><strong>Note Oggetti Personali:</strong></p>
+                                    <p class="whitespace-pre-wrap ml-2 p-1 bg-gray-50 rounded text-xs">${cl.oggettiPersonaliNote || 'Nessuna nota'}</p>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        checklistHtml = '<p class="mt-3 pt-3 border-t"><strong>Checklist Ingresso:</strong> Non compilata.</p>';
+                    }
+
+                    detailsModalTitle.textContent = `Dettagli Lavoro del ${new Date(work.date).toLocaleDateString('it-IT')}`;
+                    detailsModalBody.innerHTML = `
+                        <p><strong>Data:</strong> ${new Date(work.date).toLocaleDateString('it-IT')}</p>
+                        <div class="mt-2">
+                            <p><strong>Descrizione Lavoro:</strong></p>
+                            <p class="whitespace-pre-wrap ml-2 p-1 bg-gray-50 rounded text-xs">${work.description}</p>
+                        </div>
+                        <div class="mt-2">
+                            <p><strong>Ricambi da Sostituire (Preventivo):</strong></p>
+                            <ul class="list-disc list-inside ml-4 text-xs">${partsToReplaceList}</ul>
+                        </div>
+                        <div class="mt-2">
+                            <p><strong>Ricambi Effettivamente Utilizzati:</strong></p>
+                            <ul class="list-disc list-inside ml-4 text-xs">${partsUsedList}</ul>
+                        </div>
+                        <p class="mt-2"><strong>Costo:</strong> € ${parseFloat(work.cost || 0).toFixed(2)}</p>
+                        <div class="mt-2">
+                            <p><strong>Note Meccanico:</strong></p>
+                            <p class="whitespace-pre-wrap ml-2 p-1 bg-gray-50 rounded text-xs">${work.mechanicNotes || 'Nessuna nota'}</p>
+                        </div>
+                        ${checklistHtml}
+                    `;
+                    detailsModalDeleteButton.onclick = () => confirmDelete('work', workId, `Lavoro del ${new Date(work.date).toLocaleDateString('it-IT')}`);
+                    detailsModalDeleteButton.classList.remove('hidden');
+                    openModal('viewDetailsModal');
+                } else {
+                    showFeedbackMessage("Lavoro non trovato.", 'error');
+                }
+            } catch (error) {
+                console.error("Errore nel visualizzare i dettagli del lavoro:", error);
+                 showFeedbackMessage("Errore visualizzazione dettagli: " + error.message, 'error');
+            }
+        };
+
+        // --- FUNZIONI DI ELIMINAZIONE ---
+        function confirmDelete(type, id, name) {
+            showFeedbackMessage(`Stai per eliminare "${name}". Clicca di nuovo ELIMINA nel popup se sei sicuro.`, 'error', 6000);
+            detailsModalDeleteButton.textContent = 'CONFERMA ELIMINAZIONE';
+            detailsModalDeleteButton.classList.remove('bg-red-500', 'hover:bg-red-600');
+            detailsModalDeleteButton.classList.add('bg-yellow-500', 'hover:bg-yellow-600', 'text-black');
+
+            detailsModalDeleteButton.onclick = () => { 
+                deleteItem(type, id, name);
+                detailsModalDeleteButton.textContent = 'Elimina';
+                 detailsModalDeleteButton.innerHTML = '<i class="fas fa-trash-alt mr-2"></i>Elimina';
+                detailsModalDeleteButton.classList.remove('bg-yellow-500', 'hover:bg-yellow-600', 'text-black');
+                detailsModalDeleteButton.classList.add('bg-red-500', 'hover:bg-red-600');
+                closeModal('viewDetailsModal');
+            };
+        }
+
+        async function deleteItem(type, id, name) {
+            if (!userId) {
+                showFeedbackMessage("Utente non autenticato. Impossibile eliminare.", 'error');
+                return;
+            }
+            let docPath;
+            let relatedDeletions = [];
+
+            if (type === 'customer') {
+                docPath = `artifacts/${appId}/users/${userId}/customers/${id}`;
+                const vehiclesQuery = query(collection(db, `artifacts/${appId}/users/${userId}/vehicles`), where("customerId", "==", id));
+                const vehiclesSnapshot = await getDocs(vehiclesQuery);
+                for (const vehicleDoc of vehiclesSnapshot.docs) {
+                    relatedDeletions.push(deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/vehicles`, vehicleDoc.id)));
+                    const worksQuery = query(collection(db, `artifacts/${appId}/users/${userId}/work_entries`), where("vehicleId", "==", vehicleDoc.id));
+                    const worksSnapshot = await getDocs(worksQuery);
+                    worksSnapshot.forEach(workDoc => {
+                        relatedDeletions.push(deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/work_entries`, workDoc.id)));
+                    });
+                }
+            } else if (type === 'vehicle') {
+                docPath = `artifacts/${appId}/users/${userId}/vehicles/${id}`;
+                const worksQuery = query(collection(db, `artifacts/${appId}/users/${userId}/work_entries`), where("vehicleId", "==", id));
+                const worksSnapshot = await getDocs(worksQuery);
+                worksSnapshot.forEach(workDoc => {
+                    relatedDeletions.push(deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/work_entries`, workDoc.id)));
+                });
+            } else if (type === 'work') {
+                docPath = `artifacts/${appId}/users/${userId}/work_entries/${id}`;
+            } else {
+                showFeedbackMessage("Tipo di elemento non valido per l'eliminazione.", 'error');
+                return;
+            }
+
+            try {
+                await deleteDoc(doc(db, docPath));
+                await Promise.all(relatedDeletions); 
+                
+                showFeedbackMessage(`${type.charAt(0).toUpperCase() + type.slice(1)} "${name}" eliminato/a con successo (e dati correlati).`, 'success');
+                closeModal('viewDetailsModal');
+
+                if (type === 'customer') {
+                    currentCustomerId = null; 
+                    currentVehicleId = null;
+                    showTab('clienti'); 
+                    tabVeicoliBtn.disabled = true;
+                    tabLavoriBtn.disabled = true;
+                    vehiclesListEl.innerHTML = '<p class="text-gray-500">Seleziona un cliente.</p>';
+                    worksListEl.innerHTML = '<p class="text-gray-500">Seleziona un veicolo.</p>';
+                } else if (type === 'vehicle') {
+                    currentVehicleId = null; 
+                    loadVehicles(); 
+                    showTab('veicoli');
+                    tabLavoriBtn.disabled = true;
+                    worksListEl.innerHTML = '<p class="text-gray-500">Seleziona un veicolo.</p>';
+                } else if (type === 'work') {
+                    loadWorks(); 
+                    showTab('lavori');
+                }
+            } catch (error) {
+                console.error(`Errore nell'eliminare ${type}: `, error);
+                showFeedbackMessage(`Errore eliminazione ${type}: ${error.message}`, 'error');
+            }
+        }
+
+        showTab('clienti');
+
+    </script>
+</body>
+</html>
