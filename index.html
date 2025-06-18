@@ -304,6 +304,8 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
+
+	const SHARED_DATA_USER_ID = "workshop-data-v1"; // Choose a descriptive string    
         // ID dell'app (verrà iniettato da Canvas se disponibile)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-officina-app';
         let userId = null; 
@@ -414,7 +416,7 @@
                 customersListEl.innerHTML = '<p class="text-red-500">Autenticazione in corso o fallita. Riprova tra poco.</p>';
                 return;
             }
-            const customersColPath = `artifacts/${appId}/users/${userId}/customers`;
+	    const customersColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/customers`;
             const q = query(collection(db, customersColPath)); 
 
             onSnapshot(q, (snapshot) => {
@@ -477,7 +479,7 @@
                 showFeedbackMessage("Utente non autenticato. Impossibile salvare.", 'error');
                 return;
             }
-            const customersColPath = `artifacts/${appId}/users/${userId}/customers`;
+            const customersColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/customers`;
             try {
                 await addDoc(collection(db, customersColPath), {
                     name: document.getElementById('customerName').value,
@@ -497,7 +499,7 @@
 
         window.viewCustomerDetails = async function(customerId) {
             if (!userId) return;
-            const customerDocPath = `artifacts/${appId}/users/${userId}/customers/${customerId}`;
+            const customerDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/customers/${customerId}`;
             try {
                 const docSnap = await getDoc(doc(db, customerDocPath));
                 if (docSnap.exists()) {
@@ -547,7 +549,7 @@
                 vehiclesListEl.innerHTML = '<p class="text-gray-500">Seleziona un cliente per vedere i suoi veicoli.</p>';
                 return;
             }
-            const vehiclesColPath = `artifacts/${appId}/users/${userId}/vehicles`;
+            const vehiclesColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/vehicles`;
             const q = query(collection(db, vehiclesColPath), where("customerId", "==", currentCustomerId)); 
 
             onSnapshot(q, (snapshot) => {
@@ -607,7 +609,7 @@
                  showFeedbackMessage("Seleziona un cliente prima di aggiungere un veicolo.", 'error');
                 return;
             }
-            const vehiclesColPath = `artifacts/${appId}/users/${userId}/vehicles`;
+            const vehiclesColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/vehicles`;
             try {
                 await addDoc(collection(db, vehiclesColPath), {
                     customerId: currentCustomerId,
@@ -630,7 +632,7 @@
 
         window.viewVehicleDetails = async function(vehicleId) {
             if (!userId) return;
-            const vehicleDocPath = `artifacts/${appId}/users/${userId}/vehicles/${vehicleId}`;
+            const vehicleDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/vehicles/${vehicleId}`;
             try {
                 const docSnap = await getDoc(doc(db, vehicleDocPath));
                 if (docSnap.exists()) {
@@ -675,7 +677,7 @@
                 worksListEl.innerHTML = '<p class="text-gray-500">Seleziona un veicolo per vedere lo storico dei lavori.</p>';
                 return;
             }
-            const worksColPath = `artifacts/${appId}/users/${userId}/work_entries`;
+            const worksColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/work_entries`;
             const q = query(collection(db, worksColPath), where("vehicleId", "==", currentVehicleId)); 
 
             onSnapshot(q, (snapshot) => {
@@ -747,7 +749,7 @@
                 oggettiPersonaliNote: document.getElementById('workChecklistPersonalItemsNotes').value,
             };
 
-            const worksColPath = `artifacts/${appId}/users/${userId}/work_entries`;
+            const worksColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/work_entries`;
             try {
                 await addDoc(collection(db, worksColPath), {
                     vehicleId: currentVehicleId,
@@ -770,7 +772,7 @@
         
         window.viewWorkDetails = async function(workId) {
             if (!userId) return;
-            const workDocPath = `artifacts/${appId}/users/${userId}/work_entries/${workId}`;
+            const workDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/work_entries/${workId}`;
             try {
                 const docSnap = await getDoc(doc(db, workDocPath));
                 if (docSnap.exists()) {
@@ -860,34 +862,40 @@
         }
 
         async function deleteItem(type, id, name) {
-            if (!userId) {
-                showFeedbackMessage("Utente non autenticato. Impossibile eliminare.", 'error');
+            if (!userId && !SHARED_DATA_USER_ID) { // Technically, with shared ID, userId from auth isn't the primary key for the path anymore
+                showFeedbackMessage("Configurazione ID utente non valida. Impossibile eliminare.", 'error');
                 return;
             }
+            if (!SHARED_DATA_USER_ID) { // Double check SHARED_DATA_USER_ID is defined
+                 showFeedbackMessage("ID Condiviso non configurato. Impossibile eliminare.", 'error');
+                return;
+            }
+
             let docPath;
             let relatedDeletions = [];
+            const basePath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}`; // Define base path for clarity
 
             if (type === 'customer') {
-                docPath = `artifacts/${appId}/users/${userId}/customers/${id}`;
-                const vehiclesQuery = query(collection(db, `artifacts/${appId}/users/${userId}/vehicles`), where("customerId", "==", id));
+                docPath = `${basePath}/customers/${id}`;
+                const vehiclesQuery = query(collection(db, `${basePath}/vehicles`), where("customerId", "==", id));
                 const vehiclesSnapshot = await getDocs(vehiclesQuery);
                 for (const vehicleDoc of vehiclesSnapshot.docs) {
-                    relatedDeletions.push(deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/vehicles`, vehicleDoc.id)));
-                    const worksQuery = query(collection(db, `artifacts/${appId}/users/${userId}/work_entries`), where("vehicleId", "==", vehicleDoc.id));
+                    relatedDeletions.push(deleteDoc(doc(db, `${basePath}/vehicles`, vehicleDoc.id)));
+                    const worksQuery = query(collection(db, `${basePath}/work_entries`), where("vehicleId", "==", vehicleDoc.id));
                     const worksSnapshot = await getDocs(worksQuery);
                     worksSnapshot.forEach(workDoc => {
-                        relatedDeletions.push(deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/work_entries`, workDoc.id)));
+                        relatedDeletions.push(deleteDoc(doc(db, `${basePath}/work_entries`, workDoc.id)));
                     });
                 }
             } else if (type === 'vehicle') {
-                docPath = `artifacts/${appId}/users/${userId}/vehicles/${id}`;
-                const worksQuery = query(collection(db, `artifacts/${appId}/users/${userId}/work_entries`), where("vehicleId", "==", id));
+                docPath = `${basePath}/vehicles/${id}`;
+                const worksQuery = query(collection(db, `${basePath}/work_entries`), where("vehicleId", "==", id));
                 const worksSnapshot = await getDocs(worksQuery);
                 worksSnapshot.forEach(workDoc => {
-                    relatedDeletions.push(deleteDoc(doc(db, `artifacts/${appId}/users/${userId}/work_entries`, workDoc.id)));
+                    relatedDeletions.push(deleteDoc(doc(db, `${basePath}/work_entries`, workDoc.id)));
                 });
             } else if (type === 'work') {
-                docPath = `artifacts/${appId}/users/${userId}/work_entries/${id}`;
+                docPath = `${basePath}/work_entries/${id}`;
             } else {
                 showFeedbackMessage("Tipo di elemento non valido per l'eliminazione.", 'error');
                 return;
@@ -895,27 +903,28 @@
 
             try {
                 await deleteDoc(doc(db, docPath));
-                await Promise.all(relatedDeletions); 
-                
+                await Promise.all(relatedDeletions);
+
                 showFeedbackMessage(`${type.charAt(0).toUpperCase() + type.slice(1)} "${name}" eliminato/a con successo (e dati correlati).`, 'success');
                 closeModal('viewDetailsModal');
 
+                // Reset UI elements as before
                 if (type === 'customer') {
-                    currentCustomerId = null; 
+                    currentCustomerId = null;
                     currentVehicleId = null;
-                    showTab('clienti'); 
+                    showTab('clienti');
                     tabVeicoliBtn.disabled = true;
                     tabLavoriBtn.disabled = true;
                     vehiclesListEl.innerHTML = '<p class="text-gray-500">Seleziona un cliente.</p>';
                     worksListEl.innerHTML = '<p class="text-gray-500">Seleziona un veicolo.</p>';
                 } else if (type === 'vehicle') {
-                    currentVehicleId = null; 
-                    loadVehicles(); 
+                    currentVehicleId = null;
+                    loadVehicles(); // This will now use SHARED_DATA_USER_ID
                     showTab('veicoli');
                     tabLavoriBtn.disabled = true;
                     worksListEl.innerHTML = '<p class="text-gray-500">Seleziona un veicolo.</p>';
                 } else if (type === 'work') {
-                    loadWorks(); 
+                    loadWorks(); // This will now use SHARED_DATA_USER_ID
                     showTab('lavori');
                 }
             } catch (error) {
@@ -923,7 +932,6 @@
                 showFeedbackMessage(`Errore eliminazione ${type}: ${error.message}`, 'error');
             }
         }
-
         showTab('clienti');
 
     </script>
