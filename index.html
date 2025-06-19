@@ -376,49 +376,56 @@
         sessionKey: "workshop_auth_session"
     };
 
-    function showMainApp() {
-        console.log("DEBUG: showMainApp() ESEGUITA - DENTRO LA FUNZIONE"); // Log chiave
-        const loginScreenEl = document.getElementById('loginScreen');
-        const mainAppEl = document.getElementById('mainApp');
+function showMainApp() {
+    console.log("DEBUG: showMainApp() ESEGUITA - DENTRO LA FUNZIONE");
+    const loginScreenEl = document.getElementById('loginScreen');
+    const mainAppEl = document.getElementById('mainApp');
 
-        if (loginScreenEl) {
-            console.log("DEBUG: loginScreenEl trovato. Aggiungo hidden, rimuovo flex."); // Log chiave
-            loginScreenEl.classList.add('hidden');
-            loginScreenEl.classList.remove('flex', 'items-center', 'justify-center');
-        } else {
-            console.error("ERRORE: Elemento 'loginScreen' NON TROVATO in showMainApp");
-        }
-
-        if (mainAppEl) {
-            console.log("DEBUG: mainAppEl trovato. Rimuovo hidden."); // Log chiave
-            mainAppEl.classList.remove('hidden');
-        } else {
-            console.error("ERRORE: Elemento 'mainApp' NON TROVATO in showMainApp");
-        }
-        console.log("DEBUG: Fine di showMainApp()"); // Log chiave
+    if (loginScreenEl) {
+        console.log("DEBUG: loginScreenEl trovato. Aggiungo hidden, rimuovo flex.");
+        loginScreenEl.classList.add('hidden');
+        // QUESTE RIGHE SONO FONDAMENTALI:
+        loginScreenEl.classList.remove('flex');
+        loginScreenEl.classList.remove('items-center');
+        loginScreenEl.classList.remove('justify-center');
+    } else {
+        console.error("ERRORE: Elemento 'loginScreen' NON TROVATO in showMainApp");
     }
-    function showLoginScreen() {
-        console.log("DEBUG: showLoginScreen() ESEGUITA"); // Log chiave
-        const loginScreenEl = document.getElementById('loginScreen');
-        const mainAppEl = document.getElementById('mainApp');
 
-        if (loginScreenEl) {
-            console.log("DEBUG: loginScreenEl trovato. Rimuovo hidden, aggiungo flex."); // Log chiave
-            loginScreenEl.classList.remove('hidden');
-            loginScreenEl.classList.add('flex', 'items-center', 'justify-center');
-        } else {
-            console.error("ERRORE: Elemento 'loginScreen' NON TROVATO in showLoginScreen");
-        }
-
-        if (mainAppEl) {
-            console.log("DEBUG: mainAppEl trovato. Aggiungo hidden."); // Log chiave
-            mainAppEl.classList.add('hidden');
-        } else {
-            console.error("ERRORE: Elemento 'mainApp' NON TROVATO in showLoginScreen");
-        }
-        sessionStorage.removeItem(AUTH_CONFIG.sessionKey);
-        console.log("DEBUG: Fine di showLoginScreen()"); // Log chiave
+    if (mainAppEl) {
+        console.log("DEBUG: mainAppEl trovato. Rimuovo hidden.");
+        mainAppEl.classList.remove('hidden');
+    } else {
+        console.error("ERRORE: Elemento 'mainApp' NON TROVATO in showMainApp");
     }
+    console.log("DEBUG: Fine di showMainApp()");
+}
+
+function showLoginScreen() {
+    console.log("DEBUG: showLoginScreen() ESEGUITA");
+    const loginScreenEl = document.getElementById('loginScreen');
+    const mainAppEl = document.getElementById('mainApp');
+
+    if (loginScreenEl) {
+        console.log("DEBUG: loginScreenEl trovato. Rimuovo hidden, aggiungo flex.");
+        loginScreenEl.classList.remove('hidden');
+        // QUESTE RIGHE SONO FONDAMENTALI:
+        loginScreenEl.classList.add('flex');
+        loginScreenEl.classList.add('items-center');
+        loginScreenEl.classList.add('justify-center');
+    } else {
+        console.error("ERRORE: Elemento 'loginScreen' NON TROVATO in showLoginScreen");
+    }
+
+    if (mainAppEl) {
+        console.log("DEBUG: mainAppEl trovato. Aggiungo hidden.");
+        mainAppEl.classList.add('hidden');
+    } else {
+        console.error("ERRORE: Elemento 'mainApp' NON TROVATO in showLoginScreen");
+    }
+    sessionStorage.removeItem(AUTH_CONFIG.sessionKey);
+    console.log("DEBUG: Fine di showLoginScreen()");
+}
 
     function checkAuthentication() {
         const session = sessionStorage.getItem(AUTH_CONFIG.sessionKey);
