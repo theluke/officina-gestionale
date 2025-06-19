@@ -109,7 +109,7 @@
         <div id="clientiContent" class="tab-content">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-semibold text-gray-700">Elenco Clienti</h2>
-                <button onclick="openAddCustomerModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">
+                <button id="addCustomerBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">
                     <i class="fas fa-plus mr-2"></i>Aggiungi Cliente
                 </button>
             </div>
@@ -123,7 +123,7 @@
         <div id="veicoliContent" class="tab-content hidden">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-semibold text-gray-700">Elenco Veicoli per <span id="customerNameForVehicles" class="text-indigo-600"></span></h2>
-                <button onclick="openAddVehicleModal()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">
+                <button id="addVehicleBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">
                     <i class="fas fa-plus mr-2"></i>Aggiungi Veicolo
                 </button>
             </div>
@@ -136,8 +136,8 @@
         <!-- Sezione Lavori -->
         <div id="lavoriContent" class="tab-content hidden">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-semibold text-gray-700">Storico Lavori per <span id="vehicleIdentifierForWorks" class="text-indigo-600"></span></h2>
-                <button onclick="openAddWorkModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">
+                <h2 class="text-2xl font-semibold text-gray-700">Storico Lavori per <span id="vehicleIdentifierForWorksEl" class="text-indigo-600"></span></h2>
+                <button id="addWorkBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">
                     <i class="fas fa-plus mr-2"></i>Aggiungi Lavoro
                 </button>
             </div>
@@ -493,14 +493,14 @@
         }
 
         // Customer modal functions
-        window.openAddCustomerModal = function() {
+        function openAddCustomerModal() {
             editMode.customer = false;
             editMode.currentId = null;
             document.getElementById('customerModalTitle').textContent = 'Aggiungi Nuovo Cliente';
             document.getElementById('customerSubmitBtn').textContent = 'Salva Cliente';
             document.getElementById('addCustomerForm').reset();
             openModal('addCustomerModal');
-        };
+        }
 
         window.editCustomer = async function(customerId) {
             if (!userId) return;
@@ -680,14 +680,14 @@
         }
 
         // Vehicle modal functions
-        window.openAddVehicleModal = function() {
+        function openAddVehicleModal() {
             editMode.vehicle = false;
             editMode.currentId = null;
             document.getElementById('vehicleModalTitle').textContent = 'Aggiungi Nuovo Veicolo';
             document.getElementById('vehicleSubmitBtn').textContent = 'Salva Veicolo';
             document.getElementById('addVehicleForm').reset();
             openModal('addVehicleModal');
-        };
+        }
 
         window.editVehicle = async function(vehicleId) {
             if (!userId) return;
@@ -865,14 +865,14 @@
         }
 
         // Work modal functions
-        window.openAddWorkModal = function() {
+        function openAddWorkModal() {
             editMode.work = false;
             editMode.currentId = null;
             document.getElementById('workModalTitle').textContent = 'Aggiungi Nuovo Lavoro';
             document.getElementById('workSubmitBtn').textContent = 'Salva Lavoro';
             document.getElementById('addWorkForm').reset();
             openModal('addWorkModal');
-        };
+        }
 
         window.editWork = async function(workId) {
             if (!userId) return;
