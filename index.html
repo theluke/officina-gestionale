@@ -403,6 +403,13 @@
         const passwordInput = document.getElementById('password').value;
         const errorDiv = document.getElementById('loginError');
 
+        console.log("DEBUG: Input Username:", "'" + usernameInput + "'");
+        console.log("DEBUG: AUTH_CONFIG Username:", "'" + AUTH_CONFIG.username + "'");
+        console.log("DEBUG: Input Password:", "'" + passwordInput + "'");
+        console.log("DEBUG: AUTH_CONFIG Password:", "'" + AUTH_CONFIG.password + "'");
+        console.log("DEBUG: Username Match?", usernameInput === AUTH_CONFIG.username);
+        console.log("DEBUG: Password Match?", passwordInput === AUTH_CONFIG.password);
+
         if (usernameInput === AUTH_CONFIG.username && passwordInput === AUTH_CONFIG.password) {
             sessionStorage.setItem(AUTH_CONFIG.sessionKey, "authenticated");
             errorDiv.classList.add('hidden');
