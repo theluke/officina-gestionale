@@ -377,30 +377,31 @@
     };
 
     function showMainApp() {
-        console.log("DEBUG: showMainApp() ESEGUITA - DENTRO LA FUNZIONE");
         const loginScreenEl = document.getElementById('loginScreen');
         const mainAppEl = document.getElementById('mainApp');
 
         if (loginScreenEl) {
-            console.log("DEBUG: loginScreenEl trovato. Aggiungo hidden.");
             loginScreenEl.classList.add('hidden');
-        } else {
-            console.error("ERRORE CRITICO: Elemento con ID 'loginScreen' NON TROVATO!");
+            loginScreenEl.classList.remove('flex', 'items-center', 'justify-center');
         }
 
         if (mainAppEl) {
             mainAppEl.classList.remove('hidden');
-            console.log("DEBUG: #mainApp classes dopo remove:", mainAppEl.className); // Vedi le classi
-            mainAppEl.style.backgroundColor = 'lightgreen'; // Test visivo
-            mainAppEl.style.display = 'block'; // Forza la visualizzazione
-            console.log("DEBUG: #mainApp display style:", mainAppEl.style.display);
-        } else { console.error("ID 'mainApp' NON TROVATO"); }
-            console.log("DEBUG: Classi modificate (o tentate) in showMainApp");
         }
+    }
 
     function showLoginScreen() {
-        document.getElementById('loginScreen').classList.remove('hidden');
-        document.getElementById('mainApp').classList.add('hidden');
+        const loginScreenEl = document.getElementById('loginScreen');
+        const mainAppEl = document.getElementById('mainApp');
+
+        if (loginScreenEl) {
+            loginScreenEl.classList.remove('hidden');
+            loginScreenEl.classList.add('flex', 'items-center', 'justify-center');
+        }
+
+        if (mainAppEl) {
+            mainAppEl.classList.add('hidden');
+        }
         sessionStorage.removeItem(AUTH_CONFIG.sessionKey);
     }
 
