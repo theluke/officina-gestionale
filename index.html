@@ -377,32 +377,47 @@
     };
 
     function showMainApp() {
+        console.log("DEBUG: showMainApp() ESEGUITA - DENTRO LA FUNZIONE"); // Log chiave
         const loginScreenEl = document.getElementById('loginScreen');
         const mainAppEl = document.getElementById('mainApp');
 
         if (loginScreenEl) {
+            console.log("DEBUG: loginScreenEl trovato. Aggiungo hidden, rimuovo flex."); // Log chiave
             loginScreenEl.classList.add('hidden');
             loginScreenEl.classList.remove('flex', 'items-center', 'justify-center');
+        } else {
+            console.error("ERRORE: Elemento 'loginScreen' NON TROVATO in showMainApp");
         }
 
         if (mainAppEl) {
+            console.log("DEBUG: mainAppEl trovato. Rimuovo hidden."); // Log chiave
             mainAppEl.classList.remove('hidden');
+        } else {
+            console.error("ERRORE: Elemento 'mainApp' NON TROVATO in showMainApp");
         }
+        console.log("DEBUG: Fine di showMainApp()"); // Log chiave
     }
-
     function showLoginScreen() {
+        console.log("DEBUG: showLoginScreen() ESEGUITA"); // Log chiave
         const loginScreenEl = document.getElementById('loginScreen');
         const mainAppEl = document.getElementById('mainApp');
 
         if (loginScreenEl) {
+            console.log("DEBUG: loginScreenEl trovato. Rimuovo hidden, aggiungo flex."); // Log chiave
             loginScreenEl.classList.remove('hidden');
             loginScreenEl.classList.add('flex', 'items-center', 'justify-center');
+        } else {
+            console.error("ERRORE: Elemento 'loginScreen' NON TROVATO in showLoginScreen");
         }
 
         if (mainAppEl) {
+            console.log("DEBUG: mainAppEl trovato. Aggiungo hidden."); // Log chiave
             mainAppEl.classList.add('hidden');
+        } else {
+            console.error("ERRORE: Elemento 'mainApp' NON TROVATO in showLoginScreen");
         }
         sessionStorage.removeItem(AUTH_CONFIG.sessionKey);
+        console.log("DEBUG: Fine di showLoginScreen()"); // Log chiave
     }
 
     function checkAuthentication() {
