@@ -377,6 +377,7 @@
     };
 
     function showMainApp() {
+        console.log("DEBUG: showMainApp() chiamata");
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
     }
@@ -426,6 +427,7 @@
     });
 
     function initializeFirebaseApp() {
+        console.log("DEBUG: initializeFirebaseApp() chiamata");
         const firebaseConfig = {
           apiKey: "AIzaSyCWpP2f5xihN_RVRpdbrVXl4UpUQKh61pc",
           authDomain: "db-clienti-bbfc1.firebaseapp.com",
