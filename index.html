@@ -137,7 +137,7 @@
         <!-- Sezione Lavori -->
         <div id="lavoriContent" class="tab-content hidden">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-semibold text-gray-700">Storico Lavori per <span id="vehicleIdentifierForWorksEl" class="text-indigo-600"></span></h2>
+                <h2 class="text-2xl font-semibold text-gray-700">Storico Lavori per <span id="vehicleIdentifierForWorks" class="text-indigo-600"></span></h2>
                 <button id="addWorkBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:shadow-outline">
                     <i class="fas fa-plus mr-2"></i>Aggiungi Lavoro
                 </button>
@@ -1067,6 +1067,12 @@
         }
         showTab('clienti');
 
+        // Add event listeners for the buttons after DOM elements are defined
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('addCustomerBtn').addEventListener('click', openAddCustomerModal);
+            document.getElementById('addVehicleBtn').addEventListener('click', openAddVehicleModal);
+            document.getElementById('addWorkBtn').addEventListener('click', openAddWorkModal);
+        });
     </script>
 </body>
 </html>
