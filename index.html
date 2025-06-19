@@ -377,9 +377,28 @@
     };
 
     function showMainApp() {
-        console.log("DEBUG: showMainApp() è stata chiamata ORA.");
-        document.getElementById('loginScreen').classList.add('hidden');
-        document.getElementById('mainApp').classList.remove('hidden');
+        console.log("DEBUG: showMainApp() ESEGUITA - DENTRO LA FUNZIONE");
+        const loginScreenEl = document.getElementById('loginScreen');
+        const mainAppEl = document.getElementById('mainApp');
+
+        if (loginScreenEl) {
+            console.log("DEBUG: loginScreenEl trovato. Aggiungo hidden.");
+            loginScreenEl.classList.add('hidden');
+        } else {
+            console.error("ERRORE CRITICO: Elemento con ID 'loginScreen' NON TROVATO!");
+        }
+
+        if (mainAppEl) {
+            console.log("DEBUG: mainAppEl trovato. Rimuovo hidden.");
+            mainAppEl.classList.remove('hidden');
+            // Test aggiuntivo: forza uno stile per vedere se risponde
+            // mainAppEl.style.display = 'block !important'; // Rimuovi questo dopo il test
+            // console.log("DEBUG: mainAppEl.className dopo rimozione hidden:", mainAppEl.className);
+            // console.log("DEBUG: mainAppEl.style.display dopo rimozione hidden:", window.getComputedStyle(mainAppEl).display);
+        } else {
+            console.error("ERRORE CRITICO: Elemento con ID 'mainApp' NON TROVATO!");
+        }
+        console.log("DEBUG: Classi modificate (o tentate) in showMainApp");
     }
 
     function showLoginScreen() {
