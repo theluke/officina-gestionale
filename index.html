@@ -623,673 +623,673 @@
                                selectCustomer(customerId, `${customerData.name} ${customerData.surname}`);
                             }
                         });
-
-                    }, (error) => {
-                        console.error("Errore nel caricare i clienti: ", error);
-                        customersListEl.innerHTML = `<p class="text-red-500">Errore nel caricamento dei clienti: ${error.message}</p>`;
-                        showFeedbackMessage("Errore caricamento clienti: " + error.message, 'error');
                     });
-                }
 
-                // Customer modal functions
-                function openAddCustomerModal() {
-                    editMode.customer = false;
-                    editMode.currentId = null;
-                    document.getElementById('customerModalTitle').textContent = 'Aggiungi Nuovo Cliente';
-                    document.getElementById('customerSubmitBtn').textContent = 'Salva Cliente';
-                    document.getElementById('addCustomerForm').reset();
-                    openModal('addCustomerModal');
-                }
-
-                window.editCustomer = async function(customerId) {
-                    if (!userId) return;
-                    const customerDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/customers/${customerId}`;
-                    try {
-                        const docSnap = await getDoc(doc(db, customerDocPath));
-                        if (docSnap.exists()) {
-                            const customer = docSnap.data();
-                            editMode.customer = true;
-                            editMode.currentId = customerId;
-                            
-                            document.getElementById('customerModalTitle').textContent = 'Modifica Cliente';
-                            document.getElementById('customerSubmitBtn').textContent = 'Aggiorna Cliente';
-                            
-                            // Pre-populate form
-                            document.getElementById('customerName').value = customer.name || '';
-                            document.getElementById('customerSurname').value = customer.surname || '';
-                            document.getElementById('customerPhone').value = customer.phone || '';
-                            document.getElementById('customerEmail').value = customer.email || '';
-                            document.getElementById('customerAddress').value = customer.address || '';
-                            
-                            openModal('addCustomerModal');
-                        } else {
-                            showFeedbackMessage("Cliente non trovato.", 'error');
-                        }
-                    } catch (error) {
-                        console.error("Errore nel caricare i dati del cliente:", error);
-                        showFeedbackMessage("Errore nel caricare i dati: " + error.message, 'error');
-                    }
-                };
-
-                addCustomerForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    if (!userId) {
-                        showFeedbackMessage("Utente non autenticato. Impossibile salvare.", 'error');
-                        return;
-                    }
-
-                    const customerData = {
-                        name: document.getElementById('customerName').value,
-                        surname: document.getElementById('customerSurname').value,
-                        phone: document.getElementById('customerPhone').value,
-                        email: document.getElementById('customerEmail').value,
-                        address: document.getElementById('customerAddress').value
-                    };
-
-                    try {
-                        if (editMode.customer && editMode.currentId) {
-                            // Update existing customer
-                            const customerDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/customers/${editMode.currentId}`;
-                            await updateDoc(doc(db, customerDocPath), {
-                                ...customerData,
-                                updatedAt: serverTimestamp()
-                            });
-                            showFeedbackMessage("Cliente aggiornato con successo!", 'success');
-                        } else {
-                            // Add new customer
-                            const customersColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/customers`;
-                            await addDoc(collection(db, customersColPath), {
-                                ...customerData,
-                                createdAt: serverTimestamp()
-                            });
-                            showFeedbackMessage("Cliente aggiunto con successo!", 'success');
-                        }
-                        closeModal('addCustomerModal');
-                    } catch (error) {
-                        console.error("Errore nel salvare il cliente: ", error);
-                        showFeedbackMessage("Errore salvataggio cliente: " + error.message, 'error');
-                    }
+                }, (error) => {
+                    console.error("Errore nel caricare i clienti: ", error);
+                    customersListEl.innerHTML = `<p class="text-red-500">Errore nel caricamento dei clienti: ${error.message}</p>`;
+                    showFeedbackMessage("Errore caricamento clienti: " + error.message, 'error');
                 });
+            }
 
-                window.viewCustomerDetails = async function(customerId) {
-                    if (!userId) return;
-                    const customerDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/customers/${customerId}`;
-                    try {
-                        const docSnap = await getDoc(doc(db, customerDocPath));
-                        if (docSnap.exists()) {
-                            const customer = docSnap.data();
-                            detailsModalTitle.textContent = `Dettagli Cliente: ${customer.name} ${customer.surname}`;
-                            detailsModalBody.innerHTML = `
-                                <p><strong>Nome:</strong> ${customer.name}</p>
-                                <p><strong>Cognome:</strong> ${customer.surname}</p>
-                                <p><strong>Telefono:</strong> ${customer.phone || 'N/D'}</p>
-                                <p><strong>Email:</strong> ${customer.email || 'N/D'}</p>
-                                <p><strong>Indirizzo:</strong> ${customer.address || 'N/D'}</p>
-                            `;
-                            detailsModalDeleteButton.onclick = () => confirmDelete('customer', customerId, `${customer.name} ${customer.surname}`);
-                            detailsModalDeleteButton.classList.remove('hidden');
-                            openModal('viewDetailsModal');
-                        } else {
-                            showFeedbackMessage("Cliente non trovato.", 'error');
-                        }
-                    } catch (error) {
-                        console.error("Errore nel visualizzare i dettagli del cliente:", error);
-                        showFeedbackMessage("Errore visualizzazione dettagli: " + error.message, 'error');
+            // Customer modal functions
+            function openAddCustomerModal() {
+                editMode.customer = false;
+                editMode.currentId = null;
+                document.getElementById('customerModalTitle').textContent = 'Aggiungi Nuovo Cliente';
+                document.getElementById('customerSubmitBtn').textContent = 'Salva Cliente';
+                document.getElementById('addCustomerForm').reset();
+                openModal('addCustomerModal');
+            }
+
+            window.editCustomer = async function(customerId) {
+                if (!userId) return;
+                const customerDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/customers/${customerId}`;
+                try {
+                    const docSnap = await getDoc(doc(db, customerDocPath));
+                    if (docSnap.exists()) {
+                        const customer = docSnap.data();
+                        editMode.customer = true;
+                        editMode.currentId = customerId;
+                        
+                        document.getElementById('customerModalTitle').textContent = 'Modifica Cliente';
+                        document.getElementById('customerSubmitBtn').textContent = 'Aggiorna Cliente';
+                        
+                        // Pre-populate form
+                        document.getElementById('customerName').value = customer.name || '';
+                        document.getElementById('customerSurname').value = customer.surname || '';
+                        document.getElementById('customerPhone').value = customer.phone || '';
+                        document.getElementById('customerEmail').value = customer.email || '';
+                        document.getElementById('customerAddress').value = customer.address || '';
+                        
+                        openModal('addCustomerModal');
+                    } else {
+                        showFeedbackMessage("Cliente non trovato.", 'error');
                     }
-                };
-                
-                window.selectCustomer = function(customerId, customerName) {
-                    currentCustomerId = customerId;
-                    currentCustomerName = customerName;
-                    
-                    selectedCustomerForVehiclesEl.textContent = customerName;
-                    customerNameForVehiclesEl.textContent = customerName;
-                    tabVeicoliBtn.disabled = false;
-                    
-                    currentVehicleId = null;
-                    currentVehicleIdentifier = null;
-                    selectedVehicleForWorksEl.textContent = 'Nessun veicolo';
-                    vehicleIdentifierForWorksEl.textContent = '';
-                    tabLavoriBtn.disabled = true;
-                    worksListEl.innerHTML = '<p class="text-gray-500">Seleziona un veicolo per vedere i lavori.</p>';
+                } catch (error) {
+                    console.error("Errore nel caricare i dati del cliente:", error);
+                    showFeedbackMessage("Errore nel caricare i dati: " + error.message, 'error');
+                }
+            };
 
-                    loadVehicles();
-                    showTab('veicoli');
+            addCustomerForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!userId) {
+                    showFeedbackMessage("Utente non autenticato. Impossibile salvare.", 'error');
+                    return;
                 }
 
-                // --- GESTIONE VEICOLI ---
-                function loadVehicles() {
-                    if (!userId || !currentCustomerId) {
-                        vehiclesListEl.innerHTML = '<p class="text-gray-500">Seleziona un cliente per vedere i suoi veicoli.</p>';
+                const customerData = {
+                    name: document.getElementById('customerName').value,
+                    surname: document.getElementById('customerSurname').value,
+                    phone: document.getElementById('customerPhone').value,
+                    email: document.getElementById('customerEmail').value,
+                    address: document.getElementById('customerAddress').value
+                };
+
+                try {
+                    if (editMode.customer && editMode.currentId) {
+                        // Update existing customer
+                        const customerDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/customers/${editMode.currentId}`;
+                        await updateDoc(doc(db, customerDocPath), {
+                            ...customerData,
+                            updatedAt: serverTimestamp()
+                        });
+                        showFeedbackMessage("Cliente aggiornato con successo!", 'success');
+                    } else {
+                        // Add new customer
+                        const customersColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/customers`;
+                        await addDoc(collection(db, customersColPath), {
+                            ...customerData,
+                            createdAt: serverTimestamp()
+                        });
+                        showFeedbackMessage("Cliente aggiunto con successo!", 'success');
+                    }
+                    closeModal('addCustomerModal');
+                } catch (error) {
+                    console.error("Errore nel salvare il cliente: ", error);
+                    showFeedbackMessage("Errore salvataggio cliente: " + error.message, 'error');
+                }
+            });
+
+            window.viewCustomerDetails = async function(customerId) {
+                if (!userId) return;
+                const customerDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/customers/${customerId}`;
+                try {
+                    const docSnap = await getDoc(doc(db, customerDocPath));
+                    if (docSnap.exists()) {
+                        const customer = docSnap.data();
+                        detailsModalTitle.textContent = `Dettagli Cliente: ${customer.name} ${customer.surname}`;
+                        detailsModalBody.innerHTML = `
+                            <p><strong>Nome:</strong> ${customer.name}</p>
+                            <p><strong>Cognome:</strong> ${customer.surname}</p>
+                            <p><strong>Telefono:</strong> ${customer.phone || 'N/D'}</p>
+                            <p><strong>Email:</strong> ${customer.email || 'N/D'}</p>
+                            <p><strong>Indirizzo:</strong> ${customer.address || 'N/D'}</p>
+                        `;
+                        detailsModalDeleteButton.onclick = () => confirmDelete('customer', customerId, `${customer.name} ${customer.surname}`);
+                        detailsModalDeleteButton.classList.remove('hidden');
+                        openModal('viewDetailsModal');
+                    } else {
+                        showFeedbackMessage("Cliente non trovato.", 'error');
+                    }
+                } catch (error) {
+                    console.error("Errore nel visualizzare i dettagli del cliente:", error);
+                    showFeedbackMessage("Errore visualizzazione dettagli: " + error.message, 'error');
+                }
+            };
+            
+            window.selectCustomer = function(customerId, customerName) {
+                currentCustomerId = customerId;
+                currentCustomerName = customerName;
+                
+                selectedCustomerForVehiclesEl.textContent = customerName;
+                customerNameForVehiclesEl.textContent = customerName;
+                tabVeicoliBtn.disabled = false;
+                
+                currentVehicleId = null;
+                currentVehicleIdentifier = null;
+                selectedVehicleForWorksEl.textContent = 'Nessun veicolo';
+                vehicleIdentifierForWorksEl.textContent = '';
+                tabLavoriBtn.disabled = true;
+                worksListEl.innerHTML = '<p class="text-gray-500">Seleziona un veicolo per vedere i lavori.</p>';
+
+                loadVehicles();
+                showTab('veicoli');
+            }
+
+            // --- GESTIONE VEICOLI ---
+            function loadVehicles() {
+                if (!userId || !currentCustomerId) {
+                    vehiclesListEl.innerHTML = '<p class="text-gray-500">Seleziona un cliente per vedere i suoi veicoli.</p>';
+                    return;
+                }
+                const vehiclesColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/vehicles`;
+                const q = query(collection(db, vehiclesColPath), where("customerId", "==", currentCustomerId)); 
+
+                onSnapshot(q, (snapshot) => {
+                    if (snapshot.empty) {
+                        vehiclesListEl.innerHTML = `<p class="text-gray-500">Nessun veicolo trovato per ${currentCustomerName}.</p>`;
                         return;
                     }
-                    const vehiclesColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/vehicles`;
-                    const q = query(collection(db, vehiclesColPath), where("customerId", "==", currentCustomerId)); 
+                    let html = '<ul class="space-y-3">';
+                    const vehicles = [];
+                    snapshot.forEach(doc => vehicles.push({ id: doc.id, ...doc.data() }));
 
-                    onSnapshot(q, (snapshot) => {
-                        if (snapshot.empty) {
-                            vehiclesListEl.innerHTML = `<p class="text-gray-500">Nessun veicolo trovato per ${currentCustomerName}.</p>`;
-                            return;
-                        }
-                        let html = '<ul class="space-y-3">';
-                        const vehicles = [];
-                        snapshot.forEach(doc => vehicles.push({ id: doc.id, ...doc.data() }));
+                    vehicles.sort((a, b) => {
+                        const plateA = a.licensePlate ? a.licensePlate.toLowerCase() : '';
+                        const plateB = b.licensePlate ? b.licensePlate.toLowerCase() : '';
+                        if (plateA < plateB) return -1;
+                        if (plateA > plateB) return 1;
+                        return 0;
+                    });
 
-                        vehicles.sort((a, b) => {
-                            const plateA = a.licensePlate ? a.licensePlate.toLowerCase() : '';
-                            const plateB = b.licensePlate ? b.licensePlate.toLowerCase() : '';
-                            if (plateA < plateB) return -1;
-                            if (plateA > plateB) return 1;
-                            return 0;
+                    vehicles.forEach(vehicle => {
+                        const vehicleDisplay = vehicle.licensePlate || `${vehicle.make} ${vehicle.model}`;
+                        html += `
+                            <li data-id="${vehicle.id}" class="list-item p-4 bg-white rounded-md shadow cursor-pointer flex justify-between items-center">
+                                <div>
+                                    <strong class="text-green-700">${vehicle.make} ${vehicle.model} (${vehicle.year || 'N/A'})</strong>
+                                    <p class="text-sm text-gray-600">Targa: ${vehicle.licensePlate || 'N/D'} - Telaio: ${vehicle.vin || 'N/D'}</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button onclick="event.stopPropagation(); editVehicle('${vehicle.id}')" class="text-orange-500 hover:text-orange-700" title="Modifica"><i class="fas fa-edit"></i></button>
+                                    <button onclick="event.stopPropagation(); viewVehicleDetails('${vehicle.id}')" class="text-blue-500 hover:text-blue-700" title="Visualizza"><i class="fas fa-eye"></i></button>
+                                    <button onclick="event.stopPropagation(); selectVehicle('${vehicle.id}', '${vehicleDisplay}')" class="text-purple-500 hover:text-purple-700" title="Lavori"><i class="fas fa-tools"></i></button>
+                                </div>
+                            </li>`;
+                    });
+                    html += '</ul>';
+                    vehiclesListEl.innerHTML = html;
+
+                    document.querySelectorAll('#vehiclesList li').forEach(item => {
+                        item.addEventListener('click', function() {
+                            const vehicleId = this.dataset.id;
+                            const vehicleData = vehicles.find(v => v.id === vehicleId);
+                            if (vehicleData) {
+                                selectVehicle(vehicleId, vehicleData.licensePlate || `${vehicleData.make} ${vehicleData.model}`);
+                            }
                         });
+                    });
 
-                        vehicles.forEach(vehicle => {
-                            const vehicleDisplay = vehicle.licensePlate || `${vehicle.make} ${vehicle.model}`;
-                            html += `
-                                <li data-id="${vehicle.id}" class="list-item p-4 bg-white rounded-md shadow cursor-pointer flex justify-between items-center">
+                }, (error) => {
+                    console.error("Errore nel caricare i veicoli: ", error);
+                    vehiclesListEl.innerHTML = `<p class="text-red-500">Errore nel caricamento dei veicoli: ${error.message}</p>`;
+                    showFeedbackMessage("Errore caricamento veicoli: " + error.message, 'error');
+                });
+            }
+
+            // Vehicle modal functions
+            function openAddVehicleModal() {
+                editMode.vehicle = false;
+                editMode.currentId = null;
+                document.getElementById('vehicleModalTitle').textContent = 'Aggiungi Nuovo Veicolo';
+                document.getElementById('vehicleSubmitBtn').textContent = 'Salva Veicolo';
+                document.getElementById('addVehicleForm').reset();
+                openModal('addVehicleModal');
+            }
+
+            window.editVehicle = async function(vehicleId) {
+                if (!userId) return;
+                const vehicleDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/vehicles/${vehicleId}`;
+                try {
+                    const docSnap = await getDoc(doc(db, vehicleDocPath));
+                    if (docSnap.exists()) {
+                        const vehicle = docSnap.data();
+                        editMode.vehicle = true;
+                        editMode.currentId = vehicleId;
+                        
+                        document.getElementById('vehicleModalTitle').textContent = 'Modifica Veicolo';
+                        document.getElementById('vehicleSubmitBtn').textContent = 'Aggiorna Veicolo';
+                        
+                        // Pre-populate form
+                        document.getElementById('vehicleMake').value = vehicle.make || '';
+                        document.getElementById('vehicleModel').value = vehicle.model || '';
+                        document.getElementById('vehicleYear').value = vehicle.year || '';
+                        document.getElementById('vehicleLicensePlate').value = vehicle.licensePlate || '';
+                        document.getElementById('vehicleVin').value = vehicle.vin || '';
+                        document.getElementById('vehicleEngineType').value = vehicle.engineType || '';
+                        document.getElementById('vehicleNotes').value = vehicle.notes || '';
+                        
+
+                        openModal('addVehicleModal');
+                    } else {
+                        showFeedbackMessage("Veicolo non trovato.", 'error');
+                    }
+                } catch (error) {
+                    console.error("Errore nel caricare i dati del veicolo:", error);
+                    showFeedbackMessage("Errore nel caricare i dati: " + error.message, 'error');
+                }
+            };
+
+            addVehicleForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!userId || (!currentCustomerId && !editMode.vehicle)) {
+                     showFeedbackMessage("Seleziona un cliente prima di aggiungere un veicolo.", 'error');
+                    return;
+                }
+
+                const vehicleData = {
+                    make: document.getElementById('vehicleMake').value,
+                    model: document.getElementById('vehicleModel').value,
+                    year: document.getElementById('vehicleYear').value,
+                    licensePlate: document.getElementById('vehicleLicensePlate').value.toUpperCase(),
+                    vin: document.getElementById('vehicleVin').value.toUpperCase(),
+                    engineType: document.getElementById('vehicleEngineType').value,
+                    notes: document.getElementById('vehicleNotes').value
+                };
+
+                try {
+                    if (editMode.vehicle && editMode.currentId) {
+                        // Update existing vehicle
+                        const vehicleDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/vehicles/${editMode.currentId}`;
+                        await updateDoc(doc(db, vehicleDocPath), {
+                            ...vehicleData,
+                            updatedAt: serverTimestamp()
+                        });
+                        showFeedbackMessage("Veicolo aggiornato con successo!", 'success');
+                    } else {
+                        // Add new vehicle
+                        const vehiclesColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/vehicles`;
+                        await addDoc(collection(db, vehiclesColPath), {
+                            ...vehicleData,
+                            customerId: currentCustomerId,
+                            createdAt: serverTimestamp()
+                        });
+                        showFeedbackMessage("Veicolo aggiunto con successo!", 'success');
+                    }
+                    closeModal('addVehicleModal');
+                } catch (error) {
+                    console.error("Errore nel salvare il veicolo: ", error);
+                    showFeedbackMessage("Errore salvataggio veicolo: " + error.message, 'error');
+                }
+            });
+
+            window.viewVehicleDetails = async function(vehicleId) {
+                if (!userId) return;
+                const vehicleDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/vehicles/${vehicleId}`;
+                try {
+                    const docSnap = await getDoc(doc(db, vehicleDocPath));
+                    if (docSnap.exists()) {
+                        const vehicle = docSnap.data();
+                        detailsModalTitle.textContent = `Dettagli Veicolo: ${vehicle.make} ${vehicle.model} (${vehicle.licensePlate || 'N/D'})`;
+                        detailsModalBody.innerHTML = `
+                            <p><strong>Marca:</strong> ${vehicle.make}</p>
+                            <p><strong>Modello:</strong> ${vehicle.model}</p>
+                            <p><strong>Anno:</strong> ${vehicle.year || 'N/D'}</p>
+                            <p><strong>Targa:</strong> ${vehicle.licensePlate || 'N/D'}</p>
+                            <p><strong>VIN:</strong> ${vehicle.vin || 'N/D'}</p>
+                            <p><strong>Tipo Motore:</strong> ${vehicle.engineType || 'N/D'}</p>
+                            <p><strong>Note:</strong> ${vehicle.notes || 'Nessuna nota'}</p>
+                        `;
+                        detailsModalDeleteButton.onclick = () => confirmDelete('vehicle', vehicleId, `${vehicle.make} ${vehicle.model} (${vehicle.licensePlate || 'N/D'})`);
+                        detailsModalDeleteButton.classList.remove('hidden');
+                        openModal('viewDetailsModal');
+                    } else {
+                        showFeedbackMessage("Veicolo non trovato.", 'error');
+                    }
+                } catch (error) {
+                    console.error("Errore nel visualizzare i dettagli del veicolo:", error);
+                    showFeedbackMessage("Errore visualizzazione dettagli: " + error.message, 'error');
+                }
+            };
+
+            window.selectVehicle = function(vehicleId, vehicleIdentifier) {
+                currentVehicleId = vehicleId;
+                currentVehicleIdentifier = vehicleIdentifier;
+
+                selectedVehicleForWorksEl.textContent = vehicleIdentifier;
+                vehicleIdentifierForWorksEl.textContent = vehicleIdentifier;
+                tabLavoriBtn.disabled = false;
+                
+                loadWorks();
+                showTab('lavori');
+            }
+
+            // --- GESTIONE LAVORI ---
+            function loadWorks() {
+                if (!userId || !currentVehicleId) {
+                    worksListEl.innerHTML = '<p class="text-gray-500">Seleziona un veicolo per vedere lo storico dei lavori.</p>';
+                    return;
+                }
+                const worksColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/work_entries`;
+                const q = query(collection(db, worksColPath), where("vehicleId", "==", currentVehicleId)); 
+
+                onSnapshot(q, (snapshot) => {
+                    if (snapshot.empty) {
+                        worksListEl.innerHTML = `<p class="text-gray-500">Nessun lavoro trovato per ${currentVehicleIdentifier}.</p>`;
+                        return;
+                    }
+                    let html = '<ul class="space-y-3">';
+                    const works = [];
+                    snapshot.forEach(doc => works.push({ id: doc.id, ...doc.data() }));
+
+                    works.sort((a, b) => {
+                        const dateA = a.date ? new Date(a.date) : new Date(0);
+                        const dateB = b.date ? new Date(b.date) : new Date(0);
+                        return dateB - dateA; 
+                    });
+
+                    works.forEach(work => {
+                        html += `
+                            <li data-id="${work.id}" class="list-item p-4 bg-white rounded-md shadow cursor-pointer">
+                                <div class="flex justify-between items-start">
                                     <div>
-                                        <strong class="text-green-700">${vehicle.make} ${vehicle.model} (${vehicle.year || 'N/A'})</strong>
-                                        <p class="text-sm text-gray-600">Targa: ${vehicle.licensePlate || 'N/D'} - Telaio: ${vehicle.vin || 'N/D'}</p>
+                                        <strong class="text-blue-700">Data: ${new Date(work.date).toLocaleDateString('it-IT')}</strong>
+                                        <p class="text-sm text-gray-600 mt-1"><strong>Costo:</strong> € ${parseFloat(work.cost || 0).toFixed(2)}</p>
                                     </div>
                                     <div class="flex space-x-2">
-                                        <button onclick="event.stopPropagation(); editVehicle('${vehicle.id}')" class="text-orange-500 hover:text-orange-700" title="Modifica"><i class="fas fa-edit"></i></button>
-                                        <button onclick="event.stopPropagation(); viewVehicleDetails('${vehicle.id}')" class="text-blue-500 hover:text-blue-700" title="Visualizza"><i class="fas fa-eye"></i></button>
-                                        <button onclick="event.stopPropagation(); selectVehicle('${vehicle.id}', '${vehicleDisplay}')" class="text-purple-500 hover:text-purple-700" title="Lavori"><i class="fas fa-tools"></i></button>
+                                        <button onclick="event.stopPropagation(); editWork('${work.id}')" class="text-orange-500 hover:text-orange-700" title="Modifica"><i class="fas fa-edit"></i></button>
+                                        <button onclick="event.stopPropagation(); viewWorkDetails('${work.id}')" class="text-blue-500 hover:text-blue-700" title="Visualizza"><i class="fas fa-eye"></i></button>
                                     </div>
-                                </li>`;
-                        });
-                        html += '</ul>';
-                        vehiclesListEl.innerHTML = html;
-
-                        document.querySelectorAll('#vehiclesList li').forEach(item => {
-                            item.addEventListener('click', function() {
-                                const vehicleId = this.dataset.id;
-                                const vehicleData = vehicles.find(v => v.id === vehicleId);
-                                if (vehicleData) {
-                                    selectVehicle(vehicleId, vehicleData.licensePlate || `${vehicleData.make} ${vehicleData.model}`);
-                                }
-                            });
-                        });
-
-                    }, (error) => {
-                        console.error("Errore nel caricare i veicoli: ", error);
-                        vehiclesListEl.innerHTML = `<p class="text-red-500">Errore nel caricamento dei veicoli: ${error.message}</p>`;
-                        showFeedbackMessage("Errore caricamento veicoli: " + error.message, 'error');
+                                </div>
+                                <div class="mt-2">
+                                    <p class="font-semibold text-gray-700">Descrizione:</p>
+                                    <p class="text-sm text-gray-600 whitespace-pre-wrap">${work.description}</p>
+                                </div>
+                            </li>`;
                     });
-                }
+                    html += '</ul>';
+                    worksListEl.innerHTML = html;
 
-                // Vehicle modal functions
-                function openAddVehicleModal() {
-                    editMode.vehicle = false;
-                    editMode.currentId = null;
-                    document.getElementById('vehicleModalTitle').textContent = 'Aggiungi Nuovo Veicolo';
-                    document.getElementById('vehicleSubmitBtn').textContent = 'Salva Veicolo';
-                    document.getElementById('addVehicleForm').reset();
-                    openModal('addVehicleModal');
-                }
-
-                window.editVehicle = async function(vehicleId) {
-                    if (!userId) return;
-                    const vehicleDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/vehicles/${vehicleId}`;
-                    try {
-                        const docSnap = await getDoc(doc(db, vehicleDocPath));
-                        if (docSnap.exists()) {
-                            const vehicle = docSnap.data();
-                            editMode.vehicle = true;
-                            editMode.currentId = vehicleId;
-                            
-                            document.getElementById('vehicleModalTitle').textContent = 'Modifica Veicolo';
-                            document.getElementById('vehicleSubmitBtn').textContent = 'Aggiorna Veicolo';
-                            
-                            // Pre-populate form
-                            document.getElementById('vehicleMake').value = vehicle.make || '';
-                            document.getElementById('vehicleModel').value = vehicle.model || '';
-                            document.getElementById('vehicleYear').value = vehicle.year || '';
-                            document.getElementById('vehicleLicensePlate').value = vehicle.licensePlate || '';
-                            document.getElementById('vehicleVin').value = vehicle.vin || '';
-                            document.getElementById('vehicleEngineType').value = vehicle.engineType || '';
-                            document.getElementById('vehicleNotes').value = vehicle.notes || '';
-                            
-
-                            openModal('addVehicleModal');
-                        } else {
-                            showFeedbackMessage("Veicolo non trovato.", 'error');
-                        }
-                    } catch (error) {
-                        console.error("Errore nel caricare i dati del veicolo:", error);
-                        showFeedbackMessage("Errore nel caricare i dati: " + error.message, 'error');
-                    }
-                };
-
-                addVehicleForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    if (!userId || (!currentCustomerId && !editMode.vehicle)) {
-                         showFeedbackMessage("Seleziona un cliente prima di aggiungere un veicolo.", 'error');
-                        return;
-                    }
-
-                    const vehicleData = {
-                        make: document.getElementById('vehicleMake').value,
-                        model: document.getElementById('vehicleModel').value,
-                        year: document.getElementById('vehicleYear').value,
-                        licensePlate: document.getElementById('vehicleLicensePlate').value.toUpperCase(),
-                        vin: document.getElementById('vehicleVin').value.toUpperCase(),
-                        engineType: document.getElementById('vehicleEngineType').value,
-                        notes: document.getElementById('vehicleNotes').value
-                    };
-
-                    try {
-                        if (editMode.vehicle && editMode.currentId) {
-                            // Update existing vehicle
-                            const vehicleDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/vehicles/${editMode.currentId}`;
-                            await updateDoc(doc(db, vehicleDocPath), {
-                                ...vehicleData,
-                                updatedAt: serverTimestamp()
-                            });
-                            showFeedbackMessage("Veicolo aggiornato con successo!", 'success');
-                        } else {
-                            // Add new vehicle
-                            const vehiclesColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/vehicles`;
-                            await addDoc(collection(db, vehiclesColPath), {
-                                ...vehicleData,
-                                customerId: currentCustomerId,
-                                createdAt: serverTimestamp()
-                            });
-                            showFeedbackMessage("Veicolo aggiunto con successo!", 'success');
-                        }
-                        closeModal('addVehicleModal');
-                    } catch (error) {
-                        console.error("Errore nel salvare il veicolo: ", error);
-                        showFeedbackMessage("Errore salvataggio veicolo: " + error.message, 'error');
-                    }
-                });
-
-                window.viewVehicleDetails = async function(vehicleId) {
-                    if (!userId) return;
-                    const vehicleDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/vehicles/${vehicleId}`;
-                    try {
-                        const docSnap = await getDoc(doc(db, vehicleDocPath));
-                        if (docSnap.exists()) {
-                            const vehicle = docSnap.data();
-                            detailsModalTitle.textContent = `Dettagli Veicolo: ${vehicle.make} ${vehicle.model} (${vehicle.licensePlate || 'N/D'})`;
-                            detailsModalBody.innerHTML = `
-                                <p><strong>Marca:</strong> ${vehicle.make}</p>
-                                <p><strong>Modello:</strong> ${vehicle.model}</p>
-                                <p><strong>Anno:</strong> ${vehicle.year || 'N/D'}</p>
-                                <p><strong>Targa:</strong> ${vehicle.licensePlate || 'N/D'}</p>
-                                <p><strong>VIN:</strong> ${vehicle.vin || 'N/D'}</p>
-                                <p><strong>Tipo Motore:</strong> ${vehicle.engineType || 'N/D'}</p>
-                                <p><strong>Note:</strong> ${vehicle.notes || 'Nessuna nota'}</p>
-                            `;
-                            detailsModalDeleteButton.onclick = () => confirmDelete('vehicle', vehicleId, `${vehicle.make} ${vehicle.model} (${vehicle.licensePlate || 'N/D'})`);
-                            detailsModalDeleteButton.classList.remove('hidden');
-                            openModal('viewDetailsModal');
-                        } else {
-                            showFeedbackMessage("Veicolo non trovato.", 'error');
-                        }
-                    } catch (error) {
-                        console.error("Errore nel visualizzare i dettagli del veicolo:", error);
-                        showFeedbackMessage("Errore visualizzazione dettagli: " + error.message, 'error');
-                    }
-                };
-
-                window.selectVehicle = function(vehicleId, vehicleIdentifier) {
-                    currentVehicleId = vehicleId;
-                    currentVehicleIdentifier = vehicleIdentifier;
-
-                    selectedVehicleForWorksEl.textContent = vehicleIdentifier;
-                    vehicleIdentifierForWorksEl.textContent = vehicleIdentifier;
-                    tabLavoriBtn.disabled = false;
-                    
-                    loadWorks();
-                    showTab('lavori');
-                }
-
-                // --- GESTIONE LAVORI ---
-                function loadWorks() {
-                    if (!userId || !currentVehicleId) {
-                        worksListEl.innerHTML = '<p class="text-gray-500">Seleziona un veicolo per vedere lo storico dei lavori.</p>';
-                        return;
-                    }
-                    const worksColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/work_entries`;
-                    const q = query(collection(db, worksColPath), where("vehicleId", "==", currentVehicleId)); 
-
-                    onSnapshot(q, (snapshot) => {
-                        if (snapshot.empty) {
-                            worksListEl.innerHTML = `<p class="text-gray-500">Nessun lavoro trovato per ${currentVehicleIdentifier}.</p>`;
-                            return;
-                        }
-                        let html = '<ul class="space-y-3">';
-                        const works = [];
-                        snapshot.forEach(doc => works.push({ id: doc.id, ...doc.data() }));
-
-                        works.sort((a, b) => {
-                            const dateA = a.date ? new Date(a.date) : new Date(0);
-                            const dateB = b.date ? new Date(b.date) : new Date(0);
-                            return dateB - dateA; 
+                    document.querySelectorAll('#worksList li').forEach(item => {
+                        item.addEventListener('click', function() {
+                            viewWorkDetails(this.dataset.id);
                         });
+                    });
 
-                        works.forEach(work => {
-                            html += `
-                                <li data-id="${work.id}" class="list-item p-4 bg-white rounded-md shadow cursor-pointer">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <strong class="text-blue-700">Data: ${new Date(work.date).toLocaleDateString('it-IT')}</strong>
-                                            <p class="text-sm text-gray-600 mt-1"><strong>Costo:</strong> € ${parseFloat(work.cost || 0).toFixed(2)}</p>
-                                        </div>
-                                        <div class="flex space-x-2">
-                                            <button onclick="event.stopPropagation(); editWork('${work.id}')" class="text-orange-500 hover:text-orange-700" title="Modifica"><i class="fas fa-edit"></i></button>
-                                            <button onclick="event.stopPropagation(); viewWorkDetails('${work.id}')" class="text-blue-500 hover:text-blue-700" title="Visualizza"><i class="fas fa-eye"></i></button>
-                                        </div>
+                }, (error) => {
+                    console.error("Errore nel caricare i lavori: ", error);
+                    worksListEl.innerHTML = `<p class="text-red-500">Errore nel caricamento dei lavori: ${error.message}</p>`;
+                    showFeedbackMessage("Errore caricamento lavori: " + error.message, 'error');
+                });
+            }
+
+            // Work modal functions
+            function openAddWorkModal() {
+                editMode.work = false;
+                editMode.currentId = null;
+                document.getElementById('workModalTitle').textContent = 'Aggiungi Nuovo Lavoro';
+                document.getElementById('workSubmitBtn').textContent = 'Salva Lavoro';
+                document.getElementById('addWorkForm').reset();
+                openModal('addWorkModal');
+            }
+
+            window.editWork = async function(workId) {
+                if (!userId) return;
+                const workDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/work_entries/${workId}`;
+                try {
+                    const docSnap = await getDoc(doc(db, workDocPath));
+                    if (docSnap.exists()) {
+                        const work = docSnap.data();
+                        editMode.work = true;
+                        editMode.currentId = workId;
+                        
+                        document.getElementById('workModalTitle').textContent = 'Modifica Lavoro';
+                        document.getElementById('workSubmitBtn').textContent = 'Aggiorna Lavoro';
+                        
+                        // Pre-populate form
+                        document.getElementById('workDate').value = work.date || '';
+                        document.getElementById('workDescription').value = work.description || '';
+                        document.getElementById('workPartsToReplace').value = work.partsToReplace || '';
+                        document.getElementById('workPartsUsed').value = work.partsUsed || '';
+                        document.getElementById('workCost').value = work.cost || '';
+                        document.getElementById('workMechanicNotes').value = work.mechanicNotes || '';
+                        
+                        // Pre-populate checklist if exists
+                        if (work.checklistIngresso) {
+                            const cl = work.checklistIngresso;
+                            document.getElementById('workChecklistKm').value = cl.kmIngresso || '';
+                            document.getElementById('workChecklistFuel').value = cl.livelloCarburante || '';
+                            document.getElementById('workChecklistLightsFront').checked = cl.luciAnterioriOk || false;
+                            document.getElementById('workChecklistLightsRear').checked = cl.luciPosterioriOk || false;
+                            document.getElementById('workChecklistIndicators').checked = cl.frecceOk || false;
+                            document.getElementById('workChecklistOilLevel').checked = cl.livelloOlioOk || false;
+                            document.getElementById('workChecklistCoolantLevel').checked = cl.livelloLiquidoRaffreddamentoOk || false;
+                            document.getElementById('workChecklistTirePressureNotes').value = cl.pressionePneumaticiInfo || '';
+                            document.getElementById('workChecklistBodyDamageNotes').value = cl.danniCarrozzeriaNote || '';
+                            document.getElementById('workChecklistPersonalItemsNotes').value = cl.oggettiPersonaliNote || '';
+                        }
+                        
+                        openModal('addWorkModal');
+                    } else {
+                        showFeedbackMessage("Lavoro non trovato.", 'error');
+                    }
+                } catch (error) {
+                    console.error("Errore nel caricare i dati del lavoro:", error);
+                    showFeedbackMessage("Errore nel caricare i dati: " + error.message, 'error');
+                }
+            };
+
+            addWorkForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (!userId || (!currentVehicleId && !editMode.work)) {
+                    showFeedbackMessage("Seleziona un veicolo prima di aggiungere un lavoro.", 'error');
+                    return;
+                }
+
+                const checklistIngresso = {
+                    kmIngresso: document.getElementById('workChecklistKm').value ? parseInt(document.getElementById('workChecklistKm').value) : null,
+                    livelloCarburante: document.getElementById('workChecklistFuel').value,
+                    luciAnterioriOk: document.getElementById('workChecklistLightsFront').checked,
+                    luciPosterioriOk: document.getElementById('workChecklistLightsRear').checked,
+                    frecceOk: document.getElementById('workChecklistIndicators').checked,
+                    livelloOlioOk: document.getElementById('workChecklistOilLevel').checked,
+                    livelloLiquidoRaffreddamentoOk: document.getElementById('workChecklistCoolantLevel').checked,
+                    pressionePneumaticiInfo: document.getElementById('workChecklistTirePressureNotes').value,
+                    danniCarrozzeriaNote: document.getElementById('workChecklistBodyDamageNotes').value,
+                    oggettiPersonaliNote: document.getElementById('workChecklistPersonalItemsNotes').value,
+                };
+
+                const workData = {
+                    date: document.getElementById('workDate').value,
+                    description: document.getElementById('workDescription').value,
+                    partsToReplace: document.getElementById('workPartsToReplace').value,
+                    partsUsed: document.getElementById('workPartsUsed').value,
+                    cost: parseFloat(document.getElementById('workCost').value) || 0,
+                    mechanicNotes: document.getElementById('workMechanicNotes').value,
+                    checklistIngresso: checklistIngresso
+                };
+
+                try {
+                    if (editMode.work && editMode.currentId) {
+                        // Update existing work
+                        const workDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/work_entries/${editMode.currentId}`;
+                        await updateDoc(doc(db, workDocPath), {
+                            ...workData,
+                            updatedAt: serverTimestamp()
+                        });
+                        showFeedbackMessage("Lavoro aggiornato con successo!", 'success');
+                    } else {
+                        // Add new work
+                        const worksColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/work_entries`;
+                        await addDoc(collection(db, worksColPath), {
+                            ...workData,
+                            vehicleId: currentVehicleId,
+                            createdAt: serverTimestamp()
+                        });
+                        showFeedbackMessage("Lavoro aggiunto con successo!", 'success');
+                    }
+                    closeModal('addWorkModal');
+                } catch (error) {
+                    console.error("Errore nel salvare il lavoro: ", error);
+                    showFeedbackMessage("Errore salvataggio lavoro: " + error.message, 'error');
+                }
+            });
+            
+            window.viewWorkDetails = async function(workId) {
+                if (!userId) return;
+                const workDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/work_entries/${workId}`;
+                try {
+                    const docSnap = await getDoc(doc(db, workDocPath));
+                    if (docSnap.exists()) {
+                        const work = docSnap.data();
+                        const partsToReplaceList = work.partsToReplace ? work.partsToReplace.split('\n').map(p => `<li>- ${p.trim()}</li>`).join('') : 'Nessuno';
+                        const partsUsedList = work.partsUsed ? work.partsUsed.split('\n').map(p => `<li>- ${p.trim()}</li>`).join('') : 'Nessuno';
+                        
+                        let checklistHtml = '';
+                        if (work.checklistIngresso) {
+                            const cl = work.checklistIngresso;
+                            checklistHtml = `
+                                <div class="mt-4 pt-3 border-t border-gray-200">
+                                    <h4 class="text-md font-semibold text-gray-800 mb-2">Checklist Ingresso Veicolo:</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 text-sm">
+                                        <p><strong>Chilometraggio:</strong> ${cl.kmIngresso !== null && cl.kmIngresso !== undefined ? cl.kmIngresso + ' km' : 'N/D'}</p>
+                                        <p><strong>Livello Carburante:</strong> ${cl.livelloCarburante || 'N/D'}</p>
+                                        <p><strong>Luci Anteriori:</strong> ${cl.luciAnterioriOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
+                                        <p><strong>Luci Posteriori:</strong> ${cl.luciPosterioriOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
+                                        <p><strong>Frecce:</strong> ${cl.frecceOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
+                                        <p><strong>Livello Olio:</strong> ${cl.livelloOlioOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
+                                        <p><strong>Livello Liquido Raff.:</strong> ${cl.livelloLiquidoRaffreddamentoOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
+                                    </div>
+                                    <p class="mt-2"><strong>Note Pneumatici:</strong> ${cl.pressionePneumaticiInfo || 'Nessuna nota'}</p>
+                                    <div class="mt-2">
+                                        <p><strong>Note Danni Carrozzeria:</strong></p>
+                                        <p class="whitespace-pre-wrap ml-2 p-1 bg-gray-50 rounded text-xs">${cl.danniCarrozzeriaNote || 'Nessuna nota'}</p>
                                     </div>
                                     <div class="mt-2">
-                                        <p class="font-semibold text-gray-700">Descrizione:</p>
-                                        <p class="text-sm text-gray-600 whitespace-pre-wrap">${work.description}</p>
+                                        <p><strong>Note Oggetti Personali:</strong></p>
+                                        <p class="whitespace-pre-wrap ml-2 p-1 bg-gray-50 rounded text-xs">${cl.oggettiPersonaliNote || 'Nessuna nota'}</p>
                                     </div>
-                                </li>`;
-                        });
-                        html += '</ul>';
-                        worksListEl.innerHTML = html;
-
-                        document.querySelectorAll('#worksList li').forEach(item => {
-                            item.addEventListener('click', function() {
-                                viewWorkDetails(this.dataset.id);
-                            });
-                        });
-
-                    }, (error) => {
-                        console.error("Errore nel caricare i lavori: ", error);
-                        worksListEl.innerHTML = `<p class="text-red-500">Errore nel caricamento dei lavori: ${error.message}</p>`;
-                        showFeedbackMessage("Errore caricamento lavori: " + error.message, 'error');
-                    });
-                }
-
-                // Work modal functions
-                function openAddWorkModal() {
-                    editMode.work = false;
-                    editMode.currentId = null;
-                    document.getElementById('workModalTitle').textContent = 'Aggiungi Nuovo Lavoro';
-                    document.getElementById('workSubmitBtn').textContent = 'Salva Lavoro';
-                    document.getElementById('addWorkForm').reset();
-                    openModal('addWorkModal');
-                }
-
-                window.editWork = async function(workId) {
-                    if (!userId) return;
-                    const workDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/work_entries/${workId}`;
-                    try {
-                        const docSnap = await getDoc(doc(db, workDocPath));
-                        if (docSnap.exists()) {
-                            const work = docSnap.data();
-                            editMode.work = true;
-                            editMode.currentId = workId;
-                            
-                            document.getElementById('workModalTitle').textContent = 'Modifica Lavoro';
-                            document.getElementById('workSubmitBtn').textContent = 'Aggiorna Lavoro';
-                            
-                            // Pre-populate form
-                            document.getElementById('workDate').value = work.date || '';
-                            document.getElementById('workDescription').value = work.description || '';
-                            document.getElementById('workPartsToReplace').value = work.partsToReplace || '';
-                            document.getElementById('workPartsUsed').value = work.partsUsed || '';
-                            document.getElementById('workCost').value = work.cost || '';
-                            document.getElementById('workMechanicNotes').value = work.mechanicNotes || '';
-                            
-                            // Pre-populate checklist if exists
-                            if (work.checklistIngresso) {
-                                const cl = work.checklistIngresso;
-                                document.getElementById('workChecklistKm').value = cl.kmIngresso || '';
-                                document.getElementById('workChecklistFuel').value = cl.livelloCarburante || '';
-                                document.getElementById('workChecklistLightsFront').checked = cl.luciAnterioriOk || false;
-                                document.getElementById('workChecklistLightsRear').checked = cl.luciPosterioriOk || false;
-                                document.getElementById('workChecklistIndicators').checked = cl.frecceOk || false;
-                                document.getElementById('workChecklistOilLevel').checked = cl.livelloOlioOk || false;
-                                document.getElementById('workChecklistCoolantLevel').checked = cl.livelloLiquidoRaffreddamentoOk || false;
-                                document.getElementById('workChecklistTirePressureNotes').value = cl.pressionePneumaticiInfo || '';
-                                document.getElementById('workChecklistBodyDamageNotes').value = cl.danniCarrozzeriaNote || '';
-                                document.getElementById('workChecklistPersonalItemsNotes').value = cl.oggettiPersonaliNote || '';
-                            }
-                            
-                            openModal('addWorkModal');
-                        } else {
-                            showFeedbackMessage("Lavoro non trovato.", 'error');
-                        }
-                    } catch (error) {
-                        console.error("Errore nel caricare i dati del lavoro:", error);
-                        showFeedbackMessage("Errore nel caricare i dati: " + error.message, 'error');
-                    }
-                };
-
-                addWorkForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    if (!userId || (!currentVehicleId && !editMode.work)) {
-                        showFeedbackMessage("Seleziona un veicolo prima di aggiungere un lavoro.", 'error');
-                        return;
-                    }
-
-                    const checklistIngresso = {
-                        kmIngresso: document.getElementById('workChecklistKm').value ? parseInt(document.getElementById('workChecklistKm').value) : null,
-                        livelloCarburante: document.getElementById('workChecklistFuel').value,
-                        luciAnterioriOk: document.getElementById('workChecklistLightsFront').checked,
-                        luciPosterioriOk: document.getElementById('workChecklistLightsRear').checked,
-                        frecceOk: document.getElementById('workChecklistIndicators').checked,
-                        livelloOlioOk: document.getElementById('workChecklistOilLevel').checked,
-                        livelloLiquidoRaffreddamentoOk: document.getElementById('workChecklistCoolantLevel').checked,
-                        pressionePneumaticiInfo: document.getElementById('workChecklistTirePressureNotes').value,
-                        danniCarrozzeriaNote: document.getElementById('workChecklistBodyDamageNotes').value,
-                        oggettiPersonaliNote: document.getElementById('workChecklistPersonalItemsNotes').value,
-                    };
-
-                    const workData = {
-                        date: document.getElementById('workDate').value,
-                        description: document.getElementById('workDescription').value,
-                        partsToReplace: document.getElementById('workPartsToReplace').value,
-                        partsUsed: document.getElementById('workPartsUsed').value,
-                        cost: parseFloat(document.getElementById('workCost').value) || 0,
-                        mechanicNotes: document.getElementById('workMechanicNotes').value,
-                        checklistIngresso: checklistIngresso
-                    };
-
-                    try {
-                        if (editMode.work && editMode.currentId) {
-                            // Update existing work
-                            const workDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/work_entries/${editMode.currentId}`;
-                            await updateDoc(doc(db, workDocPath), {
-                                ...workData,
-                                updatedAt: serverTimestamp()
-                            });
-                            showFeedbackMessage("Lavoro aggiornato con successo!", 'success');
-                        } else {
-                            // Add new work
-                            const worksColPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/work_entries`;
-                            await addDoc(collection(db, worksColPath), {
-                                ...workData,
-                                vehicleId: currentVehicleId,
-                                createdAt: serverTimestamp()
-                            });
-                            showFeedbackMessage("Lavoro aggiunto con successo!", 'success');
-                        }
-                        closeModal('addWorkModal');
-                    } catch (error) {
-                        console.error("Errore nel salvare il lavoro: ", error);
-                        showFeedbackMessage("Errore salvataggio lavoro: " + error.message, 'error');
-                    }
-                });
-                
-                window.viewWorkDetails = async function(workId) {
-                    if (!userId) return;
-                    const workDocPath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}/work_entries/${workId}`;
-                    try {
-                        const docSnap = await getDoc(doc(db, workDocPath));
-                        if (docSnap.exists()) {
-                            const work = docSnap.data();
-                            const partsToReplaceList = work.partsToReplace ? work.partsToReplace.split('\n').map(p => `<li>- ${p.trim()}</li>`).join('') : 'Nessuno';
-                            const partsUsedList = work.partsUsed ? work.partsUsed.split('\n').map(p => `<li>- ${p.trim()}</li>`).join('') : 'Nessuno';
-                            
-                            let checklistHtml = '';
-                            if (work.checklistIngresso) {
-                                const cl = work.checklistIngresso;
-                                checklistHtml = `
-                                    <div class="mt-4 pt-3 border-t border-gray-200">
-                                        <h4 class="text-md font-semibold text-gray-800 mb-2">Checklist Ingresso Veicolo:</h4>
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 text-sm">
-                                            <p><strong>Chilometraggio:</strong> ${cl.kmIngresso !== null && cl.kmIngresso !== undefined ? cl.kmIngresso + ' km' : 'N/D'}</p>
-                                            <p><strong>Livello Carburante:</strong> ${cl.livelloCarburante || 'N/D'}</p>
-                                            <p><strong>Luci Anteriori:</strong> ${cl.luciAnterioriOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
-                                            <p><strong>Luci Posteriori:</strong> ${cl.luciPosterioriOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
-                                            <p><strong>Frecce:</strong> ${cl.frecceOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
-                                            <p><strong>Livello Olio:</strong> ${cl.livelloOlioOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
-                                            <p><strong>Livello Liquido Raff.:</strong> ${cl.livelloLiquidoRaffreddamentoOk ? '<span class="text-green-600">OK</span>' : '<span class="text-red-600">Non OK / Non Controllato</span>'}</p>
-                                        </div>
-                                        <p class="mt-2"><strong>Note Pneumatici:</strong> ${cl.pressionePneumaticiInfo || 'Nessuna nota'}</p>
-                                        <div class="mt-2">
-                                            <p><strong>Note Danni Carrozzeria:</strong></p>
-                                            <p class="whitespace-pre-wrap ml-2 p-1 bg-gray-50 rounded text-xs">${cl.danniCarrozzeriaNote || 'Nessuna nota'}</p>
-                                        </div>
-                                        <div class="mt-2">
-                                            <p><strong>Note Oggetti Personali:</strong></p>
-                                            <p class="whitespace-pre-wrap ml-2 p-1 bg-gray-50 rounded text-xs">${cl.oggettiPersonaliNote || 'Nessuna nota'}</p>
-                                        </div>
-                                    </div>
-                                `;
-                            } else {
-                                checklistHtml = '<p class="mt-3 pt-3 border-t"><strong>Checklist Ingresso:</strong> Non compilata.</p>';
-                            }
-
-                            detailsModalTitle.textContent = `Dettagli Lavoro del ${new Date(work.date).toLocaleDateString('it-IT')}`;
-                            detailsModalBody.innerHTML = `
-                                <p><strong>Data:</strong> ${new Date(work.date).toLocaleDateString('it-IT')}</p>
-                                <div class="mt-2">
-                                    <p><strong>Descrizione Lavoro:</strong></p>
-                                    <p class="whitespace-pre-wrap ml-2 p-1 bg-gray-50 rounded text-xs">${work.description}</p>
                                 </div>
-                                <div class="mt-2">
-                                    <p><strong>Ricambi da Sostituire (Preventivo):</strong></p>
-                                    <ul class="list-disc list-inside ml-4 text-xs">${partsToReplaceList}</ul>
-                                </div>
-                                <div class="mt-2">
-                                    <p><strong>Ricambi Effettivamente Utilizzati:</strong></p>
-                                    <ul class="list-disc list-inside ml-4 text-xs">${partsUsedList}</ul>
-                                </div>
-                                <p class="mt-2"><strong>Costo:</strong> € ${parseFloat(work.cost || 0).toFixed(2)}</p>
-                                <div class="mt-2">
-                                    <p><strong>Note Meccanico:</strong></p>
-                                    <p class="whitespace-pre-wrap ml-2 p-1 bg-gray-50 rounded text-xs">${work.mechanicNotes || 'Nessuna nota'}</p>
-                                </div>
-                                ${checklistHtml}
                             `;
-                            detailsModalDeleteButton.onclick = () => confirmDelete('work', workId, `Lavoro del ${new Date(work.date).toLocaleDateString('it-IT')}`);
-                            detailsModalDeleteButton.classList.remove('hidden');
-                            openModal('viewDetailsModal');
                         } else {
-                            showFeedbackMessage("Lavoro non trovato.", 'error');
+                            checklistHtml = '<p class="mt-3 pt-3 border-t"><strong>Checklist Ingresso:</strong> Non compilata.</p>';
                         }
-                    } catch (error) {
-                        console.error("Errore nel visualizzare i dettagli del lavoro:", error);
-                         showFeedbackMessage("Errore visualizzazione dettagli: " + error.message, 'error');
+
+                        detailsModalTitle.textContent = `Dettagli Lavoro del ${new Date(work.date).toLocaleDateString('it-IT')}`;
+                        detailsModalBody.innerHTML = `
+                            <p><strong>Data:</strong> ${new Date(work.date).toLocaleDateString('it-IT')}</p>
+                            <div class="mt-2">
+                                <p><strong>Descrizione Lavoro:</strong></p>
+                                <p class="whitespace-pre-wrap ml-2 p-1 bg-gray-50 rounded text-xs">${work.description}</p>
+                            </div>
+                            <div class="mt-2">
+                                <p><strong>Ricambi da Sostituire (Preventivo):</strong></p>
+                                <ul class="list-disc list-inside ml-4 text-xs">${partsToReplaceList}</ul>
+                            </div>
+                            <div class="mt-2">
+                                <p><strong>Ricambi Effettivamente Utilizzati:</strong></p>
+                                <ul class="list-disc list-inside ml-4 text-xs">${partsUsedList}</ul>
+                            </div>
+                            <p class="mt-2"><strong>Costo:</strong> € ${parseFloat(work.cost || 0).toFixed(2)}</p>
+                            <div class="mt-2">
+                                <p><strong>Note Meccanico:</strong></p>
+                                <p class="whitespace-pre-wrap ml-2 p-1 bg-gray-50 rounded text-xs">${work.mechanicNotes || 'Nessuna nota'}</p>
+                            </div>
+                            ${checklistHtml}
+                        `;
+                        detailsModalDeleteButton.onclick = () => confirmDelete('work', workId, `Lavoro del ${new Date(work.date).toLocaleDateString('it-IT')}`);
+                        detailsModalDeleteButton.classList.remove('hidden');
+                        openModal('viewDetailsModal');
+                    } else {
+                        showFeedbackMessage("Lavoro non trovato.", 'error');
                     }
+                } catch (error) {
+                    console.error("Errore nel visualizzare i dettagli del lavoro:", error);
+                     showFeedbackMessage("Errore visualizzazione dettagli: " + error.message, 'error');
+                }
+            };
+
+            // --- FUNZIONI DI ELIMINAZIONE ---
+            function confirmDelete(type, id, name) {
+                showFeedbackMessage(`Stai per eliminare "${name}". Clicca di nuovo ELIMINA nel popup se sei sicuro.`, 'error', 6000);
+                detailsModalDeleteButton.textContent = 'CONFERMA ELIMINAZIONE';
+                detailsModalDeleteButton.classList.remove('bg-red-500', 'hover:bg-red-600');
+                detailsModalDeleteButton.classList.add('bg-yellow-500', 'hover:bg-yellow-600', 'text-black');
+
+                detailsModalDeleteButton.onclick = () => { 
+                    deleteItem(type, id, name);
+                    detailsModalDeleteButton.textContent = 'Elimina';
+                     detailsModalDeleteButton.innerHTML = '<i class="fas fa-trash-alt mr-2"></i>Elimina';
+                    detailsModalDeleteButton.classList.remove('bg-yellow-500', 'hover:bg-yellow-600', 'text-black');
+                    detailsModalDeleteButton.classList.add('bg-red-500', 'hover:bg-red-600');
+                    closeModal('viewDetailsModal');
                 };
+            }
 
-                // --- FUNZIONI DI ELIMINAZIONE ---
-                function confirmDelete(type, id, name) {
-                    showFeedbackMessage(`Stai per eliminare "${name}". Clicca di nuovo ELIMINA nel popup se sei sicuro.`, 'error', 6000);
-                    detailsModalDeleteButton.textContent = 'CONFERMA ELIMINAZIONE';
-                    detailsModalDeleteButton.classList.remove('bg-red-500', 'hover:bg-red-600');
-                    detailsModalDeleteButton.classList.add('bg-yellow-500', 'hover:bg-yellow-600', 'text-black');
-
-                    detailsModalDeleteButton.onclick = () => { 
-                        deleteItem(type, id, name);
-                        detailsModalDeleteButton.textContent = 'Elimina';
-                         detailsModalDeleteButton.innerHTML = '<i class="fas fa-trash-alt mr-2"></i>Elimina';
-                        detailsModalDeleteButton.classList.remove('bg-yellow-500', 'hover:bg-yellow-600', 'text-black');
-                        detailsModalDeleteButton.classList.add('bg-red-500', 'hover:bg-red-600');
-                        closeModal('viewDetailsModal');
-                    };
+            async function deleteItem(type, id, name) {
+                if (!userId && !SHARED_DATA_USER_ID) { // Technically, with shared ID, userId from auth isn't the primary key for the path anymore
+                    showFeedbackMessage "Configurazione ID utente non valida. Impossibile eliminare.", 'error');
+                    return;
+                }
+                if (!SHARED_DATA_USER_ID) { // Double check SHARED_DATA_USER_ID is defined
+                     showFeedbackMessage("ID Condiviso non configurato. Impossibile eliminare.", 'error');
+                    return;
                 }
 
-                async function deleteItem(type, id, name) {
-                    if (!userId && !SHARED_DATA_USER_ID) { // Technically, with shared ID, userId from auth isn't the primary key for the path anymore
-                        showFeedbackMessage("Configurazione ID utente non valida. Impossibile eliminare.", 'error');
-                        return;
-                    }
-                    if (!SHARED_DATA_USER_ID) { // Double check SHARED_DATA_USER_ID is defined
-                         showFeedbackMessage("ID Condiviso non configurato. Impossibile eliminare.", 'error');
-                        return;
-                    }
+                let docPath;
+                let relatedDeletions = [];
+                const basePath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}`; // Define base path for clarity
 
-                    let docPath;
-                    let relatedDeletions = [];
-                    const basePath = `artifacts/${appId}/users/${SHARED_DATA_USER_ID}`; // Define base path for clarity
-
-                    if (type === 'customer') {
-                        docPath = `${basePath}/customers/${id}`;
-                        const vehiclesQuery = query(collection(db, `${basePath}/vehicles`), where("customerId", "==", id));
-                        const vehiclesSnapshot = await getDocs(vehiclesQuery);
-                        for (const vehicleDoc of vehiclesSnapshot.docs) {
-                            relatedDeletions.push(deleteDoc(doc(db, `${basePath}/vehicles`, vehicleDoc.id)));
-                            const worksQuery = query(collection(db, `${basePath}/work_entries`), where("vehicleId", "==", vehicleDoc.id));
-                            const worksSnapshot = await getDocs(worksQuery);
-                            worksSnapshot.forEach(workDoc => {
-                                relatedDeletions.push(deleteDoc(doc(db, `${basePath}/work_entries`, workDoc.id)));
-                            });
-                        }
-                    } else if (type === 'vehicle') {
-                        docPath = `${basePath}/vehicles/${id}`;
-                        const worksQuery = query(collection(db, `${basePath}/work_entries`), where("vehicleId", "==", id));
+                if (type === 'customer') {
+                    docPath = `${basePath}/customers/${id}`;
+                    const vehiclesQuery = query(collection(db, `${basePath}/vehicles`), where("customerId", "==", id));
+                    const vehiclesSnapshot = await getDocs(vehiclesQuery);
+                    for (const vehicleDoc of vehiclesSnapshot.docs) {
+                        relatedDeletions.push(deleteDoc(doc(db, `${basePath}/vehicles`, vehicleDoc.id)));
+                        const worksQuery = query(collection(db, `${basePath}/work_entries`), where("vehicleId", "==", vehicleDoc.id));
                         const worksSnapshot = await getDocs(worksQuery);
                         worksSnapshot.forEach(workDoc => {
                             relatedDeletions.push(deleteDoc(doc(db, `${basePath}/work_entries`, workDoc.id)));
                         });
-                    } else if (type === 'work') {
-                        docPath = `${basePath}/work_entries/${id}`;
-                    } else {
-                        showFeedbackMessage("Tipo di elemento non valido per l'eliminazione.", 'error');
-                        return;
                     }
-
-                    try {
-                        await deleteDoc(doc(db, docPath));
-                        await Promise.all(relatedDeletions);
-
-                        showFeedbackMessage(`${type.charAt(0).toUpperCase() + type.slice(1)} "${name}" eliminato/a con successo (e dati correlati).`, 'success');
-                        closeModal('viewDetailsModal');
-
-                        // Reset UI elements as before
-                        if (type === 'customer') {
-                            currentCustomerId = null;
-                            currentVehicleId = null;
-                            showTab('clienti');
-                            tabVeicoliBtn.disabled = true;
-                            tabLavoriBtn.disabled = true;
-                            vehiclesListEl.innerHTML = '<p class="text-gray-500">Seleziona un cliente.</p>';
-                            worksListEl.innerHTML = '<p class="text-gray-500">Seleziona un veicolo.</p>';
-                        } else if (type === 'vehicle') {
-                            currentVehicleId = null;
-                            loadVehicles(); // This will now use SHARED_DATA_USER_ID
-                            showTab('veicoli');
-                            tabLavoriBtn.disabled = true;
-                            worksListEl.innerHTML = '<p class="text-gray-500">Seleziona un veicolo.</p>';
-                        } else if (type === 'work') {
-                            loadWorks(); // This will now use SHARED_DATA_USER_ID
-                            showTab('lavori');
-                        }
-                    } catch (error) {
-                        console.error(`Errore nell'eliminare ${type}: `, error);
-                        showFeedbackMessage(`Errore eliminazione ${type}: ${error.message}`, 'error');
-                    }
+                } else if (type === 'vehicle') {
+                    docPath = `${basePath}/vehicles/${id}`;
+                    const worksQuery = query(collection(db, `${basePath}/work_entries`), where("vehicleId", "==", id));
+                    const worksSnapshot = await getDocs(worksQuery);
+                    worksSnapshot.forEach(workDoc => {
+                        relatedDeletions.push(deleteDoc(doc(db, `${basePath}/work_entries`, workDoc.id)));
+                    });
+                } else if (type === 'work') {
+                    docPath = `${basePath}/work_entries/${id}`;
+                } else {
+                    showFeedbackMessage("Tipo di elemento non valido per l'eliminazione.", 'error');
+                    return;
                 }
-                showTab('clienti');
 
-                // Add event listeners immediately after element definitions
-                document.getElementById('addCustomerBtn').addEventListener('click', openAddCustomerModal);
-                document.getElementById('addVehicleBtn').addEventListener('click', openAddVehicleModal);
-                document.getElementById('addWorkBtn').addEventListener('click', openAddWorkModal);
-            }
+                try {
+                    await deleteDoc(doc(db, docPath));
+                    await Promise.all(relatedDeletions);
 
-            // Check authentication on page load
-            if (!checkAuthentication()) {
-                showLoginScreen();
+                    showFeedbackMessage(`${type.charAt(0).toUpperCase() + type.slice(1)} "${name}" eliminato/a con successo (e dati correlati).`, 'success');
+                    closeModal('viewDetailsModal');
+
+                    // Reset UI elements as before
+                    if (type === 'customer') {
+                        currentCustomerId = null;
+                        currentVehicleId = null;
+                        showTab('clienti');
+                        tabVeicoliBtn.disabled = true;
+                        tabLavoriBtn.disabled = true;
+                        vehiclesListEl.innerHTML = '<p class="text-gray-500">Seleziona un cliente.</p>';
+                        worksListEl.innerHTML = '<p class="text-gray-500">Seleziona un veicolo.</p>';
+                    } else if (type === 'vehicle') {
+                        currentVehicleId = null;
+                        loadVehicles(); // This will now use SHARED_DATA_USER_ID
+                        showTab('veicoli');
+                        tabLavoriBtn.disabled = true;
+                        worksListEl.innerHTML = '<p class="text-gray-500">Seleziona un veicolo.</p>';
+                    } else if (type === 'work') {
+                        loadWorks(); // This will now use SHARED_DATA_USER_ID
+                        showTab('lavori');
+                    }
+                } catch (error) {
+                    console.error(`Errore nell'eliminare ${type}: `, error);
+                    showFeedbackMessage(`Errore eliminazione ${type}: ${error.message}`, 'error');
+                }
             }
+            showTab('clienti');
+
+            // Add event listeners immediately after element definitions
+            document.getElementById('addCustomerBtn').addEventListener('click', openAddCustomerModal);
+            document.getElementById('addVehicleBtn').addEventListener('click', openAddVehicleModal);
+            document.getElementById('addWorkBtn').addEventListener('click', openAddWorkModal);
+        }
+
+        // Check authentication on page load
+        if (!checkAuthentication()) {
+            showLoginScreen();
         }
     </script>
 </body>
