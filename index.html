@@ -389,17 +389,14 @@
         }
 
         if (mainAppEl) {
-            console.log("DEBUG: mainAppEl trovato. Rimuovo hidden.");
             mainAppEl.classList.remove('hidden');
-            // Test aggiuntivo: forza uno stile per vedere se risponde
-            // mainAppEl.style.display = 'block !important'; // Rimuovi questo dopo il test
-            // console.log("DEBUG: mainAppEl.className dopo rimozione hidden:", mainAppEl.className);
-            // console.log("DEBUG: mainAppEl.style.display dopo rimozione hidden:", window.getComputedStyle(mainAppEl).display);
-        } else {
-            console.error("ERRORE CRITICO: Elemento con ID 'mainApp' NON TROVATO!");
+            console.log("DEBUG: #mainApp classes dopo remove:", mainAppEl.className); // Vedi le classi
+            mainAppEl.style.backgroundColor = 'lightgreen'; // Test visivo
+            mainAppEl.style.display = 'block'; // Forza la visualizzazione
+            console.log("DEBUG: #mainApp display style:", mainAppEl.style.display);
+        } else { console.error("ID 'mainApp' NON TROVATO"); }
+            console.log("DEBUG: Classi modificate (o tentate) in showMainApp");
         }
-        console.log("DEBUG: Classi modificate (o tentate) in showMainApp");
-    }
 
     function showLoginScreen() {
         document.getElementById('loginScreen').classList.remove('hidden');
