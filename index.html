@@ -377,7 +377,7 @@
     };
 
     function showMainApp() {
-        console.log("DEBUG: showMainApp() chiamata");
+        console.log("DEBUG: showMainApp() è stata chiamata ORA.");
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
     }
@@ -414,7 +414,9 @@
         if (usernameInput === AUTH_CONFIG.username && passwordInput === AUTH_CONFIG.password) {
             sessionStorage.setItem(AUTH_CONFIG.sessionKey, "authenticated");
             errorDiv.classList.add('hidden');
+            console.log("DEBUG: Sto per chiamare showMainApp()"); // NUOVO LOG
             showMainApp();
+            console.log("DEBUG: Sto per chiamare initializeFirebaseApp()"); // NUOVO LOG
             initializeFirebaseApp();
         } else {
             errorDiv.classList.remove('hidden');
