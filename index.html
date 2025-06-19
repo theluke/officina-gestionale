@@ -1210,7 +1210,7 @@
 
             async function deleteItem(type, id, name) {
                 if (!userId && !SHARED_DATA_USER_ID) { // Technically, with shared ID, userId from auth isn't the primary key for the path anymore
-                    showFeedbackMessage "Configurazione ID utente non valida. Impossibile eliminare.", 'error');
+                    showFeedbackMessage ("Configurazione ID utente non valida. Impossibile eliminare.", 'error');
                     return;
                 }
                 if (!SHARED_DATA_USER_ID) { // Double check SHARED_DATA_USER_ID is defined
