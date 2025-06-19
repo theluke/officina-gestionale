@@ -310,6 +310,14 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-officina-app';
         let userId = null; 
 
+        // Global variables for edit mode
+        let editMode = {
+            customer: false,
+            vehicle: false,
+            work: false,
+            currentId: null
+        };
+
         // Stato dell'applicazione
         let currentCustomerId = null;
         let currentCustomerName = null;
